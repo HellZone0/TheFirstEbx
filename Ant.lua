@@ -226,8 +226,8 @@ createToggleButton("GodMode", 130, "🛡️ God Mode: ON", "🛡️ God Mode: OF
 	end
 end)
 
--- Fly By Camera
-local flyConnection
+-- True Fly Anti-Kick (CFrame Movement, Anti-Detection)
+local flyCamConnection
 local flying = false
 local flySpeed = 50
 
@@ -237,35 +237,27 @@ createToggleButton("FlyCam", 210, "🕊️ Fly: ON", "🕊️ Fly: OFF", functio
 
 	if state and root then
 		flying = true
+		humanoid.PlatformStand = true -- Jangan gunakan BodyVelocity, gunakan langsung CFrame
+		local flyDirection = Vector3.zero
 
-		-- Bypass anti-fly (mengatur velocity manual tanpa BodyVelocity mencurigakan)
-		local BodyVel = Instance.new("BodyVelocity", root)
-		BodyVel.Name = "FlyVelocity"
-		BodyVel.MaxForce = Vector3.new(1, 1, 1) * 1e5
-		BodyVel.Velocity = Vector3.zero
-		BodyVel.P = 1250
-
-		flyConnection = RunService.RenderStepped:Connect(function()
-			local direction = cam.CFrame.LookVector
+		flyCamConnection = RunService.RenderStepped:Connect(function()
+			local moveDir = cam.CFrame.LookVector
 			local vertical = 0
 
-			-- Kontrol vertikal berdasarkan arah kamera
-			if direction.Y > 0.3 then
+			-- Atur arah kamera untuk naik/turun
+			if moveDir.Y > 0.3 then
 				vertical = 1
-			elseif direction.Y < -0.3 then
+			elseif moveDir.Y < -0.3 then
 				vertical = -1
 			end
 
-			local moveVec = Vector3.new(direction.X, vertical, direction.Z).Unit * flySpeed
-			BodyVel.Velocity = moveVec
+			flyDirection = Vector3.new(moveDir.X, vertical, moveDir.Z).Unit * flySpeed * RunService.RenderStepped:Wait()
+			root.CFrame = root.CFrame + flyDirection
 		end)
 	else
 		flying = false
-		if flyConnection then flyConnection:Disconnect() end
-		if char:FindFirstChild("HumanoidRootPart") then
-			local existing = char.HumanoidRootPart:FindFirstChild("FlyVelocity")
-			if existing then existing:Destroy() end
-		end
+		humanoid.PlatformStand = false
+		if flyCamConnection then flyCamConnection:Disconnect() end
 	end
 end)
 
