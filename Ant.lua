@@ -18,6 +18,21 @@ MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
 MainFrame.Draggable = true
 
+-- Tombol X (Close GUI)
+local closeBtn = Instance.new("TextButton", MainFrame)
+closeBtn.Position = UDim2.new(1, -55, 0, 5)
+closeBtn.Size = UDim2.new(0, 20, 0, 20)
+closeBtn.Text = "X"
+closeBtn.BackgroundColor3 = Color3.fromRGB(60, 30, 30)
+closeBtn.TextColor3 = Color3.new(1, 1, 1)
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 14
+Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 4)
+
+closeBtn.MouseButton1Click:Connect(function()
+	ScreenGui.Enabled = false
+end)
+
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
 
 local Title = Instance.new("TextLabel", MainFrame)
@@ -280,10 +295,11 @@ end)
 
 -- Update on Respawn
 player.CharacterAdded:Connect(function(newChar)
-enableGodMode()
+	disableGodMode()
 	char = newChar
 	humanoid = newChar:WaitForChild("Humanoid")
 	task.wait(0.3)
 	humanoid.WalkSpeed = speedValue
 	humanoid.JumpPower = jumpValue
+	enableGodMode()
 end)
