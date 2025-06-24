@@ -23,7 +23,7 @@ Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
 local Title = Instance.new("TextLabel", MainFrame)
 Title.Size = UDim2.new(1, -40, 0, 30)
 Title.Position = UDim2.new(0, 10, 0, 0)
-Title.Text = "❄️ Zone Expedition Trainer"
+Title.Text = "❄️ Zone Expedition Beta"
 Title.TextColor3 = Color3.fromRGB(180, 230, 255)
 Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.GothamSemibold
@@ -226,38 +226,39 @@ createToggleButton("GodMode", 130, "🛡️ God Mode: ON", "🛡️ God Mode: OF
 	end
 end)
 
--- True Fly Anti-Kick (CFrame Movement, Anti-Detection)
-local flyCamConnection
+-- Smooth Glide Fly Bypass Anti-Kick
+local glideConnection
 local flying = false
-local flySpeed = 50
+local flySpeed = 30
 
-createToggleButton("FlyCam", 210, "🕊️ Fly: ON", "🕊️ Fly: OFF", function(state)
+createToggleButton("FlyBypass", 210, "🕊️ Glide Fly: ON", "🕊️ Glide Fly: OFF", function(state)
 	local root = char:FindFirstChild("HumanoidRootPart")
 	local cam = workspace.CurrentCamera
 
 	if state and root then
 		flying = true
-		humanoid.PlatformStand = true -- Jangan gunakan BodyVelocity, gunakan langsung CFrame
-		local flyDirection = Vector3.zero
+		humanoid.PlatformStand = false
+		humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+		humanoid.AutoRotate = false
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+		humanoid.HipHeight = 2.5
 
-		flyCamConnection = RunService.RenderStepped:Connect(function()
+		glideConnection = RunService.RenderStepped:Connect(function()
 			local moveDir = cam.CFrame.LookVector
-			local vertical = 0
-
-			-- Atur arah kamera untuk naik/turun
-			if moveDir.Y > 0.3 then
-				vertical = 1
-			elseif moveDir.Y < -0.3 then
-				vertical = -1
-			end
-
-			flyDirection = Vector3.new(moveDir.X, vertical, moveDir.Z).Unit * flySpeed * RunService.RenderStepped:Wait()
-			root.CFrame = root.CFrame + flyDirection
+			local flyDir = Vector3.new(moveDir.X, 0.1, moveDir.Z).Unit
+			root.Velocity = flyDir * flySpeed
 		end)
 	else
 		flying = false
-		humanoid.PlatformStand = false
-		if flyCamConnection then flyCamConnection:Disconnect() end
+		humanoid.AutoRotate = true
+		humanoid.HipHeight = 0
+		if glideConnection then glideConnection:Disconnect() end
+	end
+end)
+
+local groundCheck = RunService.Heartbeat:Connect(function()
+	if flying then
+		humanoid:ChangeState(Enum.HumanoidStateType.Freefall)
 	end
 end)
 
