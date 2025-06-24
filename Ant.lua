@@ -23,7 +23,7 @@ Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
 local Title = Instance.new("TextLabel", MainFrame)
 Title.Size = UDim2.new(1, -40, 0, 30)
 Title.Position = UDim2.new(0, 10, 0, 0)
-Title.Text = "❄️ Zone Expedition Beta"
+Title.Text = "❄️ Zone Expedition Trainer"
 Title.TextColor3 = Color3.fromRGB(180, 230, 255)
 Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.GothamSemibold
@@ -206,59 +206,40 @@ task.spawn(function()
 	end
 end)
 
--- God Mode
-local godConnection
+-- Enhanced God Mode
+local godHealthConnection
+local godStateConnection
+
 createToggleButton("GodMode", 130, "🛡️ God Mode: ON", "🛡️ God Mode: OFF", function(state)
 	if state then
 		local hum = humanoid
 		if hum then
-			godConnection = hum:GetPropertyChangedSignal("Health"):Connect(function()
+			-- Cegah kehilangan darah
+			godHealthConnection = hum:GetPropertyChangedSignal("Health"):Connect(function()
 				if hum.Health < hum.MaxHealth then
 					hum.Health = hum.MaxHealth
 				end
 			end)
+
+			-- Cegah status ragdoll/falling/mati
+			godStateConnection = hum.StateChanged:Connect(function(_, newState)
+				if newState == Enum.HumanoidStateType.FallingDown or newState == Enum.HumanoidStateType.Physics or newState == Enum.HumanoidStateType.Ragdoll then
+					hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+				elseif newState == Enum.HumanoidStateType.Dead then
+					hum.Health = hum.MaxHealth
+					hum:ChangeState(Enum.HumanoidStateType.Running)
+				end
+			end)
 		end
 	else
-		if godConnection then
-			godConnection:Disconnect()
-			godConnection = nil
+		if godHealthConnection then
+			godHealthConnection:Disconnect()
+			godHealthConnection = nil
 		end
-	end
-end)
-
--- Smooth Glide Fly Bypass Anti-Kick
-local glideConnection
-local flying = false
-local flySpeed = 30
-
-createToggleButton("FlyBypass", 210, "🕊️ Glide Fly: ON", "🕊️ Glide Fly: OFF", function(state)
-	local root = char:FindFirstChild("HumanoidRootPart")
-	local cam = workspace.CurrentCamera
-
-	if state and root then
-		flying = true
-		humanoid.PlatformStand = false
-		humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-		humanoid.AutoRotate = false
-		humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
-		humanoid.HipHeight = 2.5
-
-		glideConnection = RunService.RenderStepped:Connect(function()
-			local moveDir = cam.CFrame.LookVector
-			local flyDir = Vector3.new(moveDir.X, 0.1, moveDir.Z).Unit
-			root.Velocity = flyDir * flySpeed
-		end)
-	else
-		flying = false
-		humanoid.AutoRotate = true
-		humanoid.HipHeight = 0
-		if glideConnection then glideConnection:Disconnect() end
-	end
-end)
-
-local groundCheck = RunService.Heartbeat:Connect(function()
-	if flying then
-		humanoid:ChangeState(Enum.HumanoidStateType.Freefall)
+		if godStateConnection then
+			godStateConnection:Disconnect()
+			godStateConnection = nil
+		end
 	end
 end)
 
