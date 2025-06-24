@@ -1,203 +1,170 @@
--- Expedition Antarctica Stylish UI Script (Full Fixed)
--- By Dyntzy (Modded by ChatGPT)
+-- Expedition Antarctica Script (UI Lama, Sudah Dirapikan)
+-- Versi by Zyntzy & ChatGPT
 
-local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-
-local player = Players.LocalPlayer
+local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local humanoid = char:WaitForChild("Humanoid")
 local rootPart = char:WaitForChild("HumanoidRootPart")
+local uis = game:GetService("UserInputService")
+local runService = game:GetService("RunService")
 
--- GUI Container
-local screenGui = Instance.new("ScreenGui", game.CoreGui)
-screenGui.Name = "ExpeditionUI"
+-- GUI Lama
+local scrgui = Instance.new("ScreenGui", game.CoreGui)
+scrgui.Name = "Zone"
 
-local mainFrame = Instance.new("Frame", screenGui)
-mainFrame.Position = UDim2.new(0, 10, 0, 10)
-mainFrame.Size = UDim2.new(0, 220, 0, 400)
-mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-mainFrame.BorderSizePixel = 0
-mainFrame.Active = true
-mainFrame.Draggable = true
+local frame = Instance.new("Frame", scrgui)
+frame.Position = UDim2.new(0, 30, 0, 30)
+frame.Size = UDim2.new(0, 220, 0, 270)
+frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
 
--- FPS Display
-local fpsLabel = Instance.new("TextLabel", mainFrame)
-fpsLabel.Size = UDim2.new(1, 0, 0, 30)
-fpsLabel.Position = UDim2.new(0, 0, 0, 0)
-fpsLabel.BackgroundTransparency = 1
-fpsLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
-fpsLabel.Font = Enum.Font.Code
-fpsLabel.TextSize = 16
-fpsLabel.Text = "FPS: 0"
+local title = Instance.new("TextLabel", frame)
+title.Text = "Expedition Script"
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 18
 
--- FPS Counter
-task.spawn(function()
-	local fps = 0
-	local last = tick()
-	RunService.RenderStepped:Connect(function()
-		fps += 1
-		if tick() - last >= 1 then
-			fpsLabel.Text = "FPS: " .. fps
-			fps = 0
-			last = tick()
-		end
-	end)
-end)
+-- Input Speed
+local speedLbl = Instance.new("TextLabel", frame)
+speedLbl.Text = "Speed:"
+speedLbl.Position = UDim2.new(0, 10, 0, 40)
+speedLbl.Size = UDim2.new(0, 50, 0, 20)
+speedLbl.BackgroundTransparency = 1
+speedLbl.TextColor3 = Color3.new(1,1,1)
 
--- Function to create labels and inputs
-local function createInput(labelText, posY, defaultValue)
-	local label = Instance.new("TextLabel", mainFrame)
-	label.Size = UDim2.new(0, 100, 0, 30)
-	label.Position = UDim2.new(0, 10, 0, posY)
-	label.BackgroundTransparency = 1
-	label.TextColor3 = Color3.new(1, 1, 1)
-	label.Text = labelText
-	label.Font = Enum.Font.Code
-	label.TextSize = 14
+local speedBox = Instance.new("TextBox", frame)
+speedBox.Position = UDim2.new(0, 70, 0, 40)
+speedBox.Size = UDim2.new(0, 130, 0, 20)
+speedBox.Text = "16"
+speedBox.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+speedBox.TextColor3 = Color3.new(1,1,1)
 
-	local box = Instance.new("TextBox", mainFrame)
-	box.Size = UDim2.new(0, 80, 0, 30)
-	box.Position = UDim2.new(0, 120, 0, posY)
-	box.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-	box.TextColor3 = Color3.new(1, 1, 1)
-	box.Text = tostring(defaultValue)
-	box.Font = Enum.Font.Code
-	box.TextSize = 14
+-- Input Jump
+local jumpLbl = speedLbl:Clone()
+jumpLbl.Text = "Jump:"
+jumpLbl.Position = UDim2.new(0, 10, 0, 70)
+jumpLbl.Parent = frame
 
-	return box
-end
+local jumpBox = speedBox:Clone()
+jumpBox.Position = UDim2.new(0, 70, 0, 70)
+jumpBox.Text = "50"
+jumpBox.Parent = frame
 
--- Function to create toggle buttons
-local function createToggleButton(name, posY, onText, offText, callback)
-	local btn = Instance.new("TextButton", mainFrame)
-	btn.Size = UDim2.new(1, -20, 0, 30)
+-- Fly Input
+local flyLbl = speedLbl:Clone()
+flyLbl.Text = "Fly Y:"
+flyLbl.Position = UDim2.new(0, 10, 0, 100)
+flyLbl.Parent = frame
+
+local flyBox = speedBox:Clone()
+flyBox.Position = UDim2.new(0, 70, 0, 100)
+flyBox.Text = "50"
+flyBox.Parent = frame
+
+-- Buttons
+local function createButton(text, posY)
+	local btn = Instance.new("TextButton", frame)
+	btn.Text = text
 	btn.Position = UDim2.new(0, 10, 0, posY)
-	btn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-	btn.TextColor3 = Color3.new(1, 1, 1)
-	btn.Font = Enum.Font.Code
-	btn.TextSize = 14
-	btn.Text = offText
-
-	local state = false
-	btn.MouseButton1Click:Connect(function()
-		state = not state
-		btn.Text = state and onText or offText
-		callback(state)
-	end)
-
+	btn.Size = UDim2.new(0, 200, 0, 25)
+	btn.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+	btn.TextColor3 = Color3.new(1,1,1)
+	btn.Font = Enum.Font.SourceSans
+	btn.TextSize = 16
 	return btn
 end
 
--- State Variables
-local antiStormEnabled = false
-local flyEnabled = false
-local godConnection
-local flyHeight = 50
+-- Toggle Variables
+local godToggle, stormToggle, flyToggle = false, false, false
+local godConn
 
--- Posisi awal Y untuk elemen GUI
-local nextY = 40
-local spacing = 40
-
--- Input Boxes
-local speedBox = createInput("Speed:", nextY, "16")
-nextY += spacing
-local jumpBox = createInput("Jump:", nextY, "50")
-nextY += spacing
-local flyBox = createInput("Fly Y:", nextY, "50")
-nextY += spacing
-
--- Anti Badai
-createToggleButton("AntiStorm", nextY, "☁ Anti Badai: ON", "☁ Anti Badai: OFF", function(state)
-	antiStormEnabled = state
-end)
-nextY += spacing
-
--- God Mode
-createToggleButton("GodMode", nextY, "🛡️ God Mode: ON", "🛡️ God Mode: OFF", function(state)
-	if state then
-		godConnection = humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+-- God Mode Button
+local godBtn = createButton("God Mode: OFF", 130)
+godBtn.MouseButton1Click:Connect(function()
+	godToggle = not godToggle
+	godBtn.Text = godToggle and "God Mode: ON" or "God Mode: OFF"
+	if godToggle then
+		godConn = humanoid:GetPropertyChangedSignal("Health"):Connect(function()
 			if humanoid.Health < humanoid.MaxHealth then
 				humanoid.Health = humanoid.MaxHealth
 			end
 		end)
 	else
-		if godConnection then godConnection:Disconnect() end
+		if godConn then godConn:Disconnect() end
 	end
 end)
-nextY += spacing
+
+-- Anti Storm Button
+local stormBtn = createButton("Anti Badai: OFF", 160)
+stormBtn.MouseButton1Click:Connect(function()
+	stormToggle = not stormToggle
+	stormBtn.Text = stormToggle and "Anti Badai: ON" or "Anti Badai: OFF"
+end)
 
 -- Fly Aman (Bypass Kick)
-local function createSafeFly(char, flyY)
-	local root = char:FindFirstChild("HumanoidRootPart")
-	if not root then return end
-
-	local alignPos = Instance.new("AlignPosition", root)
-	local alignOri = Instance.new("AlignOrientation", root)
-	local att0 = Instance.new("Attachment", root)
+local function createFlyY(offset)
+	local att0 = Instance.new("Attachment", rootPart)
 	local att1 = Instance.new("Attachment", workspace.Terrain)
+	local alignPos = Instance.new("AlignPosition", rootPart)
+	local alignOri = Instance.new("AlignOrientation", rootPart)
 
 	alignPos.Attachment0 = att0
 	alignPos.Attachment1 = att1
-	alignPos.RigidityEnabled = false
-	alignPos.MaxForce = 999999
 	alignPos.Responsiveness = 200
+	alignPos.MaxForce = 999999
+	alignPos.RigidityEnabled = false
 
 	alignOri.Attachment0 = att0
 	alignOri.Attachment1 = att1
-	alignOri.RigidityEnabled = false
-	alignOri.MaxTorque = 999999
 	alignOri.Responsiveness = 200
+	alignOri.MaxTorque = 999999
+	alignOri.RigidityEnabled = false
 
-	local renderConn
-	renderConn = RunService.RenderStepped:Connect(function()
-		if not flyEnabled then
-			renderConn:Disconnect()
-			alignPos:Destroy()
-			alignOri:Destroy()
+	local flyConn
+	flyConn = runService.RenderStepped:Connect(function()
+		if not flyToggle then
+			flyConn:Disconnect()
 			att0:Destroy()
 			att1:Destroy()
+			alignPos:Destroy()
+			alignOri:Destroy()
 			return
 		end
-		att1.WorldPosition = root.Position + Vector3.new(0, flyY, 0)
-		att1.WorldOrientation = Vector3.new(0, 0, 0)
+		att1.WorldPosition = rootPart.Position + Vector3.new(0, offset, 0)
 	end)
 end
 
--- Fly Toggle
-createToggleButton("FlyToggle", nextY, "✈️ Fly: ON", "✈️ Fly: OFF", function(state)
-	flyEnabled = state
-	if state then
-		local val = tonumber(flyBox.Text)
-		flyHeight = val or 50
-		createSafeFly(char, flyHeight)
+-- Fly Button
+local flyBtn = createButton("Fly: OFF", 190)
+flyBtn.MouseButton1Click:Connect(function()
+	flyToggle = not flyToggle
+	flyBtn.Text = flyToggle and "Fly: ON" or "Fly: OFF"
+	if flyToggle then
+		local val = tonumber(flyBox.Text) or 50
+		createFlyY(val)
 	end
 end)
-nextY += spacing
 
--- Reset Button
-local resetBtn = Instance.new("TextButton", mainFrame)
-resetBtn.Size = UDim2.new(1, -20, 0, 30)
-resetBtn.Position = UDim2.new(0, 10, 0, nextY)
-resetBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-resetBtn.TextColor3 = Color3.new(1, 1, 1)
-resetBtn.Font = Enum.Font.Code
-resetBtn.TextSize = 14
-resetBtn.Text = "🔄 Reset Karakter"
+-- Reset Char Button
+local resetBtn = createButton("Reset Karakter", 220)
+resetBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
 resetBtn.MouseButton1Click:Connect(function()
 	player:LoadCharacter()
 end)
 
--- Apply Settings Loop
-RunService.RenderStepped:Connect(function()
+-- Loop Apply Speed/Jump
+runService.RenderStepped:Connect(function()
 	local speed = tonumber(speedBox.Text) or 16
 	local jump = tonumber(jumpBox.Text) or 50
 	humanoid.WalkSpeed = speed
 	humanoid.JumpPower = jump
 
-	if antiStormEnabled then
-		for _, v in pairs(workspace:GetDescendants()) do
+	if stormToggle then
+		for _,v in pairs(workspace:GetDescendants()) do
 			if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") then
 				v.Enabled = false
 			end
@@ -205,11 +172,11 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
--- Toggle GUI dengan RightCtrl
-local guiVisible = true
-UserInputService.InputBegan:Connect(function(input)
+-- Hide GUI dengan RightControl
+local visible = true
+uis.InputBegan:Connect(function(input)
 	if input.KeyCode == Enum.KeyCode.RightControl then
-		guiVisible = not guiVisible
-		mainFrame.Visible = guiVisible
+		visible = not visible
+		frame.Visible = visible
 	end
 end)
