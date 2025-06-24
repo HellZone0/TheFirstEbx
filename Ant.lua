@@ -206,40 +206,56 @@ task.spawn(function()
 	end
 end)
 
--- Enhanced God Mode
-local godHealthConnection
-local godStateConnection
+-- Enhanced God Mode - Anti Mati Jatuh Fix
+local godConnections = {}
+
+local function enableGodMode()
+	local hum = humanoid
+	if not hum then return end
+
+	hum.BreakJointsOnDeath = false
+
+	-- Cegah kehilangan darah
+	table.insert(godConnections, hum:GetPropertyChangedSignal("Health"):Connect(function()
+		if hum.Health < hum.MaxHealth then
+			hum.Health = hum.MaxHealth
+		end
+	end))
+
+	-- Cegah status jatuh atau mati
+	table.insert(godConnections, hum.StateChanged:Connect(function(_, newState)
+		if newState == Enum.HumanoidStateType.Freefall
+			or newState == Enum.HumanoidStateType.FallingDown
+			or newState == Enum.HumanoidStateType.Physics
+			or newState == Enum.HumanoidStateType.Ragdoll then
+			hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+			hum.PlatformStand = false
+		elseif newState == Enum.HumanoidStateType.Dead then
+			task.wait()
+			hum.Health = hum.MaxHealth
+			hum:ChangeState(Enum.HumanoidStateType.Running)
+		end
+	end))
+
+	-- Cegah mati total
+	table.insert(godConnections, hum.Died:Connect(function()
+		hum.Health = hum.MaxHealth
+		hum:ChangeState(Enum.HumanoidStateType.Running)
+	end))
+end
+
+local function disableGodMode()
+	for _, con in ipairs(godConnections) do
+		con:Disconnect()
+	end
+	table.clear(godConnections)
+end
 
 createToggleButton("GodMode", 130, "🛡️ God Mode: ON", "🛡️ God Mode: OFF", function(state)
 	if state then
-		local hum = humanoid
-		if hum then
-			-- Cegah kehilangan darah
-			godHealthConnection = hum:GetPropertyChangedSignal("Health"):Connect(function()
-				if hum.Health < hum.MaxHealth then
-					hum.Health = hum.MaxHealth
-				end
-			end)
-
-			-- Cegah status ragdoll/falling/mati
-			godStateConnection = hum.StateChanged:Connect(function(_, newState)
-				if newState == Enum.HumanoidStateType.FallingDown or newState == Enum.HumanoidStateType.Physics or newState == Enum.HumanoidStateType.Ragdoll then
-					hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-				elseif newState == Enum.HumanoidStateType.Dead then
-					hum.Health = hum.MaxHealth
-					hum:ChangeState(Enum.HumanoidStateType.Running)
-				end
-			end)
-		end
+		enableGodMode()
 	else
-		if godHealthConnection then
-			godHealthConnection:Disconnect()
-			godHealthConnection = nil
-		end
-		if godStateConnection then
-			godStateConnection:Disconnect()
-			godStateConnection = nil
-		end
+		disableGodMode()
 	end
 end)
 
@@ -264,6 +280,7 @@ end)
 
 -- Update on Respawn
 player.CharacterAdded:Connect(function(newChar)
+enableGodMode()
 	char = newChar
 	humanoid = newChar:WaitForChild("Humanoid")
 	task.wait(0.3)
