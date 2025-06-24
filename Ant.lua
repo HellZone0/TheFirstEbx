@@ -1,6 +1,3 @@
--- Expedition Antarctica Stylish UI Script (Full Fixed + Fly Feature)
--- Credits: Original creator + Modified by ChatGPT (with Fly + Auto Layout)
-
 --// GUI LIBRARY (Minimalist UI)
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/linhook/linhub/main/ui/linxlib.lua"))()
 local window = library:CreateWindow("Expedition Hub")
