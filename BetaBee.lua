@@ -149,10 +149,21 @@ switchTab("AFK / Farm")
 
 -- Minimize/Close logic
 local isMinimized = false
+local originalSize = MainFrame.Size
+local originalPosition = MainFrame.Position
+
 MinimizeButton.MouseButton1Click:Connect(function()
     isMinimized = not isMinimized
-    Tabs.Visible = not isMinimized
-    ContentFrame.Visible = not isMinimized
+
+    if isMinimized then
+        ContentFrame.Visible = false
+        Tabs.Visible = false
+        MainFrame:TweenSize(UDim2.new(0, 520, 0, 40), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.3, true)
+    else
+        ContentFrame.Visible = true
+        Tabs.Visible = true
+        MainFrame:TweenSize(originalSize, Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.3, true)
+    end
 end)
 
 CloseButton.MouseButton1Click:Connect(function()
