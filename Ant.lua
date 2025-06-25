@@ -1,305 +1,155 @@
--- Expedition Antarctica Stylish UI Script (Full Fixed)
+-- File gabungan Fluent UI + Expedition Antarctica Script
+--!strict
+-- Fluent UI + Expedition Antarctica Trainer Script
+-- By: ChatGPT - Gabungan full UI stylish dan modern
+
+-- >>> 1. Load Fluent UI Library
+local Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/yourusername/obiiyeuem1.lua"))()
+
+-- >>> 2. Data dan State Player
 local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local humanoid = char:WaitForChild("Humanoid")
 
 local speedValue = 16
 local jumpValue = 50
-
--- GUI
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
-ScreenGui.Name = "EA_StylishUI"
-
-local MainFrame = Instance.new("Frame", ScreenGui)
-MainFrame.Size = UDim2.new(0, 270, 0, 250)
-MainFrame.Position = UDim2.new(0.05, 0, 0.3, 0)
-MainFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
-MainFrame.BorderSizePixel = 0
-MainFrame.Active = true
-MainFrame.Draggable = true
-
--- Tombol X (Close GUI)
-local closeBtn = Instance.new("TextButton", MainFrame)
-closeBtn.Position = UDim2.new(1, -55, 0, 5)
-closeBtn.Size = UDim2.new(0, 20, 0, 20)
-closeBtn.Text = "X"
-closeBtn.BackgroundColor3 = Color3.fromRGB(60, 30, 30)
-closeBtn.TextColor3 = Color3.new(1, 1, 1)
-closeBtn.Font = Enum.Font.GothamBold
-closeBtn.TextSize = 14
-Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 4)
-
-closeBtn.MouseButton1Click:Connect(function()
-	ScreenGui.Enabled = false
-end)
-
-Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
-
-local Title = Instance.new("TextLabel", MainFrame)
-Title.Size = UDim2.new(1, -40, 0, 30)
-Title.Position = UDim2.new(0, 10, 0, 0)
-Title.Text = "❄️ Zone Expedition Trainer"
-Title.TextColor3 = Color3.fromRGB(180, 230, 255)
-Title.BackgroundTransparency = 1
-Title.Font = Enum.Font.GothamSemibold
-Title.TextSize = 16
-Title.TextXAlignment = Enum.TextXAlignment.Left
-
-local toggleBtn = Instance.new("TextButton", MainFrame)
-toggleBtn.Position = UDim2.new(1, -30, 0, 5)
-toggleBtn.Size = UDim2.new(0, 20, 0, 20)
-toggleBtn.Text = "-"
-toggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-toggleBtn.TextColor3 = Color3.new(1, 1, 1)
-toggleBtn.Font = Enum.Font.GothamBold
-toggleBtn.TextSize = 14
-Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0, 4)
-
--- 🔹 FPS Display
-local fpsLabel = Instance.new("TextLabel", MainFrame)
-fpsLabel.Size = UDim2.new(0, 80, 0, 20)
-fpsLabel.Position = UDim2.new(1, -110, 0, 5) -- Diatur supaya di samping kiri toggleBtn
-fpsLabel.BackgroundTransparency = 1
-fpsLabel.TextColor3 = Color3.fromRGB(180, 230, 255)
-fpsLabel.Font = Enum.Font.GothamSemibold
-fpsLabel.TextSize = 14
-fpsLabel.TextXAlignment = Enum.TextXAlignment.Right
-fpsLabel.Text = "FPS: 0"
-
-local contentFrame = Instance.new("Frame", MainFrame)
-contentFrame.Name = "ContentFrame"
-contentFrame.Position = UDim2.new(0, 0, 0, 35)
-contentFrame.Size = UDim2.new(1, 0, 1, -35)
-contentFrame.BackgroundTransparency = 1
-
-local minimized = false
-local originalSize = MainFrame.Size
-local minimizedSize = UDim2.new(0, 270, 0, 35)
-
-toggleBtn.MouseButton1Click:Connect(function()
-	minimized = not minimized
-	contentFrame.Visible = not minimized
-	toggleBtn.Text = minimized and "+" or "-"
-	MainFrame.Size = minimized and minimizedSize or originalSize
-end)
-
--- Toggle UI with RightCtrl
-local UIS = game:GetService("UserInputService")
-UIS.InputBegan:Connect(function(input, gameProcessed)
-	if not gameProcessed and input.KeyCode == Enum.KeyCode.RightControl then
-		ScreenGui.Enabled = not ScreenGui.Enabled
-	end
-end)
-
--- Input Builder
-local function createInput(labelText, posY, defaultText)
-	local label = Instance.new("TextLabel", contentFrame)
-	label.Position = UDim2.new(0, 10, 0, posY)
-	label.Size = UDim2.new(0, 60, 0, 30)
-	label.Text = labelText
-	label.TextColor3 = Color3.fromRGB(200, 200, 200)
-	label.BackgroundTransparency = 1
-	label.Font = Enum.Font.Gotham
-	label.TextSize = 14
-	label.TextXAlignment = Enum.TextXAlignment.Left
-
-	local box = Instance.new("TextBox", contentFrame)
-	box.Position = UDim2.new(0, 80, 0, posY)
-	box.Size = UDim2.new(0, 160, 0, 30)
-	box.Text = defaultText
-	box.Font = Enum.Font.Gotham
-	box.TextSize = 14
-	box.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-	box.TextColor3 = Color3.fromRGB(255, 255, 255)
-	box.ClearTextOnFocus = true
-	box.BorderSizePixel = 0
-	Instance.new("UICorner", box).CornerRadius = UDim.new(0, 6)
-
-	box.MouseEnter:Connect(function()
-		box.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-	end)
-	box.MouseLeave:Connect(function()
-		box.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-	end)
-
-	return box
-end
-
--- Input
-local speedBox = createInput("Speed:", 10, "16")
-local jumpBox = createInput("Jump:", 50, "50")
-
--- Apply on change
-speedBox.FocusLost:Connect(function()
-	local val = tonumber(speedBox.Text)
-	if val then
-		speedValue = val
-		if humanoid then humanoid.WalkSpeed = val end
-	end
-	speedBox.Text = tostring(speedValue)
-end)
-
-jumpBox.FocusLost:Connect(function()
-	local val = tonumber(jumpBox.Text)
-	if val then
-		jumpValue = val
-		if humanoid then humanoid.JumpPower = val end
-	end
-	jumpBox.Text = tostring(jumpValue)
-end)
-
--- Reset Button
-local resetBtn = Instance.new("TextButton", contentFrame)
-resetBtn.Position = UDim2.new(0, 10, 0, 170)
-resetBtn.Size = UDim2.new(0, 230, 0, 30)
-resetBtn.Text = "🔄 Reset Speed & Jump"
-resetBtn.Font = Enum.Font.GothamBold
-resetBtn.TextSize = 14
-resetBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-resetBtn.TextColor3 = Color3.new(1, 1, 1)
-resetBtn.BorderSizePixel = 0
-Instance.new("UICorner", resetBtn).CornerRadius = UDim.new(0, 6)
-
-resetBtn.MouseButton1Click:Connect(function()
-	speedValue = 16
-	jumpValue = 50
-	if humanoid then
-		humanoid.WalkSpeed = speedValue
-		humanoid.JumpPower = jumpValue
-	end
-	speedBox.Text = "16"
-	jumpBox.Text = "50"
-end)
-
--- Toggle Button Builder
-local function createToggleButton(name, posY, onText, offText, callback)
-	local btn = Instance.new("TextButton", contentFrame)
-	btn.Position = UDim2.new(0, 10, 0, posY)
-	btn.Size = UDim2.new(0, 230, 0, 30)
-	btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-	btn.TextColor3 = Color3.new(1, 1, 1)
-	btn.Font = Enum.Font.GothamBold
-	btn.TextSize = 14
-	btn.Text = offText
-	btn.BorderSizePixel = 0
-	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-
-	local enabled = false
-	btn.MouseButton1Click:Connect(function()
-		enabled = not enabled
-		btn.Text = enabled and onText or offText
-		btn.BackgroundColor3 = enabled and Color3.fromRGB(60, 100, 60) or Color3.fromRGB(40, 40, 40)
-		callback(enabled)
-	end)
-
-	return btn
-end
-
--- Anti Blizzard
 local antiStormEnabled = false
-createToggleButton("AntiStorm", 90, "☁ Anti Badai: ON", "☁ Anti Badai: OFF", function(state)
-	antiStormEnabled = state
-end)
-
-task.spawn(function()
-	while true do
-		task.wait(1)
-		if antiStormEnabled then
-			local Lighting = game:GetService("Lighting")
-			local cam = workspace.CurrentCamera
-			for _, v in pairs(Lighting:GetChildren()) do
-				if v:IsA("Atmosphere") or v:IsA("BloomEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("BlurEffect") then
-					v.Enabled = false
-				end
-			end
-			for _, v in pairs(cam:GetChildren()) do
-				if v:IsA("BlurEffect") then
-					v.Enabled = false
-				end
-			end
-		end
-	end
-end)
-
--- Enhanced God Mode - Anti Mati Jatuh Fix
 local godConnections = {}
 
+-- >>> 3. Fluent UI Init
+local window = Fluent:CreateWindow({
+    Title = "❄️ Zone Expedition Trainer",
+    SubTitle = "with Fluent UI",
+    TabWidth = 120,
+    Size = UDim2.fromOffset(500, 400),
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.RightControl
+})
+
+local mainTab = window:AddTab({ Title = "Main", Icon = "snowflake" })
+
+local section = mainTab:AddSection("Controls")
+
+-- >>> 4. Speed & Jump Input
+section:AddInput("Speed", function(value)
+    local num = tonumber(value)
+    if num then
+        speedValue = num
+        if humanoid then humanoid.WalkSpeed = speedValue end
+    end
+end).Input.Text = tostring(speedValue)
+
+section:AddInput("Jump", function(value)
+    local num = tonumber(value)
+    if num then
+        jumpValue = num
+        if humanoid then humanoid.JumpPower = jumpValue end
+    end
+end).Input.Text = tostring(jumpValue)
+
+-- >>> 5. Anti Storm Toggle
+section:AddToggle("☁ Anti Badai", false, function(state)
+    antiStormEnabled = state
+end)
+
+-- >>> 6. God Mode Toggle
 local function enableGodMode()
-	local hum = humanoid
-	if not hum then return end
-
-	hum.BreakJointsOnDeath = false
-
-	-- Cegah kehilangan darah
-	table.insert(godConnections, hum:GetPropertyChangedSignal("Health"):Connect(function()
-		if hum.Health < hum.MaxHealth then
-			hum.Health = hum.MaxHealth
-		end
-	end))
-
-	-- Cegah status jatuh atau mati
-	table.insert(godConnections, hum.StateChanged:Connect(function(_, newState)
-		if newState == Enum.HumanoidStateType.Freefall
-			or newState == Enum.HumanoidStateType.FallingDown
-			or newState == Enum.HumanoidStateType.Physics
-			or newState == Enum.HumanoidStateType.Ragdoll then
-			hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-			hum.PlatformStand = false
-		elseif newState == Enum.HumanoidStateType.Dead then
-			task.wait()
-			hum.Health = hum.MaxHealth
-			hum:ChangeState(Enum.HumanoidStateType.Running)
-		end
-	end))
-
-	-- Cegah mati total
-	table.insert(godConnections, hum.Died:Connect(function()
-		hum.Health = hum.MaxHealth
-		hum:ChangeState(Enum.HumanoidStateType.Running)
-	end))
+    if not humanoid then return end
+    humanoid.BreakJointsOnDeath = false
+    table.insert(godConnections, humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+        if humanoid.Health < humanoid.MaxHealth then
+            humanoid.Health = humanoid.MaxHealth
+        end
+    end))
+    table.insert(godConnections, humanoid.StateChanged:Connect(function(_, newState)
+        if newState == Enum.HumanoidStateType.Freefall or
+           newState == Enum.HumanoidStateType.FallingDown or
+           newState == Enum.HumanoidStateType.Physics or
+           newState == Enum.HumanoidStateType.Ragdoll then
+            humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+            humanoid.PlatformStand = false
+        elseif newState == Enum.HumanoidStateType.Dead then
+            task.wait()
+            humanoid.Health = humanoid.MaxHealth
+            humanoid:ChangeState(Enum.HumanoidStateType.Running)
+        end
+    end))
+    table.insert(godConnections, humanoid.Died:Connect(function()
+        humanoid.Health = humanoid.MaxHealth
+        humanoid:ChangeState(Enum.HumanoidStateType.Running)
+    end))
 end
 
 local function disableGodMode()
-	for _, con in ipairs(godConnections) do
-		con:Disconnect()
-	end
-	table.clear(godConnections)
+    for _, con in ipairs(godConnections) do
+        con:Disconnect()
+    end
+    table.clear(godConnections)
 end
 
-createToggleButton("GodMode", 130, "🛡️ God Mode: ON", "🛡️ God Mode: OFF", function(state)
-	if state then
-		enableGodMode()
-	else
-		disableGodMode()
-	end
+section:AddToggle("🛡️ God Mode", false, function(state)
+    if state then enableGodMode() else disableGodMode() end
 end)
 
--- 🔹 FPS Calculation
-local RunService = game:GetService("RunService")
+-- >>> 7. Reset Button
+section:AddButton("🔄 Reset Speed & Jump", function()
+    speedValue = 16
+    jumpValue = 50
+    if humanoid then
+        humanoid.WalkSpeed = speedValue
+        humanoid.JumpPower = jumpValue
+    end
+end)
+
+-- >>> 8. FPS Display
 local fps = 0
 local frameCount = 0
 local lastTime = tick()
+local RunService = game:GetService("RunService")
+
+local fpsLabel = Fluent.Elements.Paragraph:New("FPS: 0", section.Container)
 
 RunService.RenderStepped:Connect(function()
-	frameCount += 1
-	local now = tick()
-
-	if now - lastTime >= 1 then
-		fps = frameCount
-		frameCount = 0
-		lastTime = now
-		fpsLabel.Text = "FPS: " .. tostring(fps)
-	end
+    frameCount += 1
+    local now = tick()
+    if now - lastTime >= 1 then
+        fps = frameCount
+        frameCount = 0
+        lastTime = now
+        if fpsLabel then
+            fpsLabel:SetTitle("FPS: " .. tostring(fps))
+        end
+    end
 end)
 
+-- >>> 9. Anti Storm Loop
+coroutine.wrap(function()
+    while true do
+        task.wait(1)
+        if antiStormEnabled then
+            local Lighting = game:GetService("Lighting")
+            local cam = workspace.CurrentCamera
+            for _, v in pairs(Lighting:GetChildren()) do
+                if v:IsA("Atmosphere") or v:IsA("BloomEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("BlurEffect") then
+                    v.Enabled = false
+                end
+            end
+            for _, v in pairs(cam:GetChildren()) do
+                if v:IsA("BlurEffect") then
+                    v.Enabled = false
+                end
+            end
+        end
+    end
+end)()
 
--- Update on Respawn
+-- >>> 10. Reapply on Respawn
 player.CharacterAdded:Connect(function(newChar)
-	disableGodMode()
-	char = newChar
-	humanoid = newChar:WaitForChild("Humanoid")
-	task.wait(0.3)
-	humanoid.WalkSpeed = speedValue
-	humanoid.JumpPower = jumpValue
-	enableGodMode()
+    disableGodMode()
+    char = newChar
+    humanoid = newChar:WaitForChild("Humanoid")
+    task.wait(0.3)
+    humanoid.WalkSpeed = speedValue
+    humanoid.JumpPower = jumpValue
+    enableGodMode()
 end)
