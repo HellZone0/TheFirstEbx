@@ -1,4 +1,4 @@
--- Expedition Antarctica Modern UI Script (Redesigned)
+-- Expedition Antarctica Modern UI (Enhanced UX Edition)
 local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local humanoid = char:WaitForChild("Humanoid")
@@ -6,182 +6,209 @@ local humanoid = char:WaitForChild("Humanoid")
 local speedValue = 16
 local jumpValue = 50
 local antiStormEnabled = false
+local godModeEnabled = false
 local godConnections = {}
 
--- UI Theme Colors
+-- Theme Definitions
 local themes = {
     Dark = {
         Background = Color3.fromRGB(20, 20, 25),
         Text = Color3.fromRGB(240, 240, 240),
         Accent = Color3.fromRGB(100, 160, 255),
         Button = Color3.fromRGB(30, 30, 40),
-        ToggleOn = Color3.fromRGB(50, 150, 100)
+        ToggleOn = Color3.fromRGB(80, 200, 140),
+        ToggleOff = Color3.fromRGB(60, 60, 60)
     },
     Light = {
         Background = Color3.fromRGB(240, 240, 240),
         Text = Color3.fromRGB(30, 30, 30),
         Accent = Color3.fromRGB(70, 120, 220),
         Button = Color3.fromRGB(220, 220, 220),
-        ToggleOn = Color3.fromRGB(80, 180, 120)
+        ToggleOn = Color3.fromRGB(60, 180, 120),
+        ToggleOff = Color3.fromRGB(180, 180, 180)
     }
 }
 local currentTheme = themes.Dark
 
--- Helper UI Function
-local function createUI(name, parent, props)
-    local inst = Instance.new(name)
-    for prop, val in pairs(props or {}) do
-        inst[prop] = val
-    end
+-- Helper
+local function createUI(class, parent, props)
+    local inst = Instance.new(class)
+    for k, v in pairs(props) do inst[k] = v end
     inst.Parent = parent
     return inst
 end
 
-local screenGui = createUI("ScreenGui", game.CoreGui, { Name = "EA_ModernUI", ResetOnSpawn = false })
+local gui = createUI("ScreenGui", game.CoreGui, { Name = "EA_UI", ResetOnSpawn = false })
 
-local mainFrame = createUI("Frame", screenGui, {
-    Size = UDim2.new(0, 320, 0, 280),
+local main = createUI("Frame", gui, {
+    Size = UDim2.fromOffset(330, 300),
     Position = UDim2.new(0.05, 0, 0.3, 0),
     BackgroundColor3 = currentTheme.Background,
     BorderSizePixel = 0,
     Active = true,
     Draggable = true
 })
-createUI("UICorner", mainFrame, { CornerRadius = UDim.new(0, 10) })
+createUI("UICorner", main, { CornerRadius = UDim.new(0, 12) })
+createUI("UIStroke", main, { Thickness = 1, Color = currentTheme.Accent })
 
--- Title
-local title = createUI("TextLabel", mainFrame, {
-    Size = UDim2.new(1, -40, 0, 30),
-    Position = UDim2.new(0, 10, 0, 0),
-    Text = "❄️ Zone Expedition Trainer",
-    TextColor3 = currentTheme.Text,
+local title = createUI("TextLabel", main, {
+    Position = UDim2.new(0, 15, 0, 0),
+    Size = UDim2.new(1, -60, 0, 30),
     BackgroundTransparency = 1,
     Font = Enum.Font.GothamSemibold,
-    TextSize = 16,
+    TextSize = 17,
+    Text = "❄️ Zone Expedition Trainer",
+    TextColor3 = currentTheme.Text,
     TextXAlignment = Enum.TextXAlignment.Left
 })
 
--- FPS
-local fpsLabel = createUI("TextLabel", mainFrame, {
-    Size = UDim2.new(0, 100, 0, 20),
-    Position = UDim2.new(0, 10, 0, 5),
-    BackgroundTransparency = 1,
-    TextColor3 = currentTheme.Accent,
-    Font = Enum.Font.Gotham,
-    TextSize = 13,
-    Text = "FPS: 0",
-    TextXAlignment = Enum.TextXAlignment.Left
+local closeBtn = createUI("TextButton", main, {
+    Position = UDim2.new(1, -35, 0, 5), Size = UDim2.new(0, 24, 0, 24),
+    Text = "✕", BackgroundColor3 = currentTheme.Button, TextColor3 = currentTheme.Text,
+    Font = Enum.Font.GothamBold, TextSize = 14
 })
+createUI("UICorner", closeBtn, { CornerRadius = UDim.new(1, 0) })
 
--- Close & Minimize
-local closeBtn = createUI("TextButton", mainFrame, {
-    Size = UDim2.new(0, 24, 0, 24),
-    Position = UDim2.new(1, -30, 0, 4),
-    Text = "✕",
-    Font = Enum.Font.GothamBold,
-    TextSize = 14,
-    BackgroundColor3 = currentTheme.Button,
-    TextColor3 = currentTheme.Text
-})
-createUI("UICorner", closeBtn, { CornerRadius = UDim.new(0, 5) })
-
-local toggleBtn = createUI("TextButton", mainFrame, {
-    Size = UDim2.new(0, 24, 0, 24),
-    Position = UDim2.new(1, -58, 0, 4),
-    Text = "–",
-    Font = Enum.Font.GothamBold,
-    TextSize = 14,
-    BackgroundColor3 = currentTheme.Button,
-    TextColor3 = currentTheme.Text
-})
-createUI("UICorner", toggleBtn, { CornerRadius = UDim.new(0, 5) })
-
-local contentFrame = createUI("Frame", mainFrame, {
-    Position = UDim2.new(0, 0, 0, 40),
-    Size = UDim2.new(1, 0, 1, -50),
+local content = createUI("Frame", main, {
+    Position = UDim2.new(0, 0, 0, 35), Size = UDim2.new(1, 0, 1, -45),
     BackgroundTransparency = 1
 })
+createUI("UIListLayout", content, {
+    SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 10)
+})
+createUI("UIPadding", content, {
+    PaddingTop = UDim.new(0, 5), PaddingLeft = UDim.new(0, 15), PaddingRight = UDim.new(0, 15)
+})
 
-local function createInput(labelText, posY, defaultText)
-    local label = createUI("TextLabel", contentFrame, {
-        Position = UDim2.new(0, 15, 0, posY),
-        Size = UDim2.new(0, 60, 0, 25),
-        Text = labelText,
-        BackgroundTransparency = 1,
-        TextColor3 = currentTheme.Text,
-        Font = Enum.Font.Gotham,
-        TextSize = 14
+-- FPS Display
+local fpsLabel = createUI("TextLabel", main, {
+    Position = UDim2.new(0, 15, 0, 5), Size = UDim2.new(0, 100, 0, 18),
+    BackgroundTransparency = 1, Font = Enum.Font.Gotham, TextSize = 13,
+    Text = "FPS: 0", TextXAlignment = Enum.TextXAlignment.Left,
+    TextColor3 = currentTheme.Accent
+})
+
+-- Input Builder
+local function createInputRow(labelText, defaultText, callback)
+    local container = createUI("Frame", content, { Size = UDim2.new(1, 0, 0, 26), BackgroundTransparency = 1 })
+    local label = createUI("TextLabel", container, {
+        Size = UDim2.new(0.3, 0, 1, 0), BackgroundTransparency = 1,
+        Text = labelText, TextColor3 = currentTheme.Text,
+        Font = Enum.Font.Gotham, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left
     })
-    local box = createUI("TextBox", contentFrame, {
-        Position = UDim2.new(0, 85, 0, posY),
-        Size = UDim2.new(0, 200, 0, 25),
-        Text = defaultText,
-        Font = Enum.Font.Gotham,
-        TextSize = 14,
-        BackgroundColor3 = currentTheme.Button,
-        TextColor3 = currentTheme.Text,
-        BorderSizePixel = 0,
-        ClearTextOnFocus = true
+    local box = createUI("TextBox", container, {
+        Position = UDim2.new(0.35, 0, 0, 0), Size = UDim2.new(0.65, 0, 1, 0),
+        BackgroundColor3 = currentTheme.Button, BorderSizePixel = 0,
+        Font = Enum.Font.Gotham, TextSize = 14, Text = defaultText,
+        TextColor3 = currentTheme.Text, ClearTextOnFocus = true
     })
     createUI("UICorner", box, { CornerRadius = UDim.new(0, 5) })
-    return box
+    box.FocusLost:Connect(function()
+        local val = tonumber(box.Text)
+        if val then
+            callback(val)
+        end
+        box.Text = tostring(val or defaultText)
+    end)
 end
 
-local speedBox = createInput("Speed:", 10, tostring(speedValue))
-local jumpBox = createInput("Jump:", 50, tostring(jumpValue))
-
-speedBox.FocusLost:Connect(function()
-    local val = tonumber(speedBox.Text)
-    if val then
-        speedValue = val
-        humanoid.WalkSpeed = val
-    end
-    speedBox.Text = tostring(speedValue)
+createInputRow("Speed", tostring(speedValue), function(val)
+    speedValue = val
+    if humanoid then humanoid.WalkSpeed = val end
 end)
 
-jumpBox.FocusLost:Connect(function()
-    local val = tonumber(jumpBox.Text)
-    if val then
-        jumpValue = val
-        humanoid.JumpPower = val
+createInputRow("Jump", tostring(jumpValue), function(val)
+    jumpValue = val
+    if humanoid then humanoid.JumpPower = val end
+end)
+
+-- Toggle Builder
+local function createToggle(label, state, callback)
+    local row = createUI("Frame", content, { Size = UDim2.new(1, 0, 0, 26), BackgroundTransparency = 1 })
+    local txt = createUI("TextLabel", row, {
+        Size = UDim2.new(0.7, 0, 1, 0), BackgroundTransparency = 1,
+        Text = label, TextColor3 = currentTheme.Text,
+        Font = Enum.Font.Gotham, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left
+    })
+    local btn = createUI("TextButton", row, {
+        Position = UDim2.new(0.72, 0, 0, 0), Size = UDim2.new(0.25, 0, 1, 0),
+        BackgroundColor3 = state and currentTheme.ToggleOn or currentTheme.ToggleOff,
+        Text = "", AutoButtonColor = false
+    })
+    createUI("UICorner", btn, { CornerRadius = UDim.new(1, 0) })
+
+    btn.MouseButton1Click:Connect(function()
+        state = not state
+        btn.BackgroundColor3 = state and currentTheme.ToggleOn or currentTheme.ToggleOff
+        callback(state)
+    end)
+end
+
+-- Toggles
+createToggle("☁ Anti Badai", antiStormEnabled, function(s)
+    antiStormEnabled = s
+end)
+
+createToggle("🛡 God Mode", godModeEnabled, function(s)
+    godModeEnabled = s
+    if s then
+        local hum = humanoid
+        if hum then
+            hum.BreakJointsOnDeath = false
+            table.insert(godConnections, hum:GetPropertyChangedSignal("Health"):Connect(function()
+                if hum.Health < hum.MaxHealth then
+                    hum.Health = hum.MaxHealth
+                end
+            end))
+            table.insert(godConnections, hum.StateChanged:Connect(function(_, newState)
+                if newState == Enum.HumanoidStateType.Freefall or
+                   newState == Enum.HumanoidStateType.FallingDown or
+                   newState == Enum.HumanoidStateType.Physics or
+                   newState == Enum.HumanoidStateType.Ragdoll then
+                    hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+                    hum.PlatformStand = false
+                elseif newState == Enum.HumanoidStateType.Dead then
+                    task.wait()
+                    hum.Health = hum.MaxHealth
+                    hum:ChangeState(Enum.HumanoidStateType.Running)
+                end
+            end))
+            table.insert(godConnections, hum.Died:Connect(function()
+                hum.Health = hum.MaxHealth
+                hum:ChangeState(Enum.HumanoidStateType.Running)
+            end))
+        end
+    else
+        for _, c in ipairs(godConnections) do c:Disconnect() end
+        table.clear(godConnections)
     end
-    jumpBox.Text = tostring(jumpValue)
 end)
 
 -- Theme Switcher
-local themeToggle = createUI("TextButton", contentFrame, {
-    Position = UDim2.new(0, 15, 0, 90),
-    Size = UDim2.new(0, 270, 0, 25),
+local themeBtn = createUI("TextButton", content, {
+    Size = UDim2.new(1, 0, 0, 30),
     Text = "🎨 Toggle Theme",
     Font = Enum.Font.GothamBold,
     TextSize = 14,
     BackgroundColor3 = currentTheme.Button,
     TextColor3 = currentTheme.Text
 })
-createUI("UICorner", themeToggle, { CornerRadius = UDim.new(0, 6) })
+createUI("UICorner", themeBtn, { CornerRadius = UDim.new(0, 5) })
 
-themeToggle.MouseButton1Click:Connect(function()
-    currentTheme = (currentTheme == themes.Dark) and themes.Light or themes.Dark
-    mainFrame.BackgroundColor3 = currentTheme.Background
+themeBtn.MouseButton1Click:Connect(function()
+    currentTheme = currentTheme == themes.Dark and themes.Light or themes.Dark
+    main.BackgroundColor3 = currentTheme.Background
     title.TextColor3 = currentTheme.Text
     fpsLabel.TextColor3 = currentTheme.Accent
     closeBtn.BackgroundColor3 = currentTheme.Button
-    toggleBtn.BackgroundColor3 = currentTheme.Button
-    toggleBtn.TextColor3 = currentTheme.Text
     closeBtn.TextColor3 = currentTheme.Text
-    speedBox.BackgroundColor3 = currentTheme.Button
-    speedBox.TextColor3 = currentTheme.Text
-    jumpBox.BackgroundColor3 = currentTheme.Button
-    jumpBox.TextColor3 = currentTheme.Text
-    themeToggle.BackgroundColor3 = currentTheme.Button
-    themeToggle.TextColor3 = currentTheme.Text
+    themeBtn.BackgroundColor3 = currentTheme.Button
+    themeBtn.TextColor3 = currentTheme.Text
 end)
 
--- FPS Logic
+-- FPS Calc
 local RunService = game:GetService("RunService")
-local fps = 0
-local frameCount = 0
-local lastTime = tick()
+local fps, frameCount, lastTime = 0, 0, tick()
 RunService.RenderStepped:Connect(function()
     frameCount += 1
     local now = tick()
@@ -193,21 +220,22 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- Close/Minimize
-local minimized = false
-closeBtn.MouseButton1Click:Connect(function()
-    screenGui.Enabled = false
-end)
-toggleBtn.MouseButton1Click:Connect(function()
-    minimized = not minimized
-    contentFrame.Visible = not minimized
-    toggleBtn.Text = minimized and "+" or "–"
-    mainFrame.Size = minimized and UDim2.new(0, 320, 0, 50) or UDim2.new(0, 320, 0, 280)
+-- Respawn Update
+player.CharacterAdded:Connect(function(newChar)
+    char = newChar
+    humanoid = newChar:WaitForChild("Humanoid")
+    task.wait(0.3)
+    humanoid.WalkSpeed = speedValue
+    humanoid.JumpPower = jumpValue
 end)
 
--- Key Toggle
+-- Toggle UI
 game:GetService("UserInputService").InputBegan:Connect(function(input, gpe)
     if not gpe and input.KeyCode == Enum.KeyCode.RightControl then
-        screenGui.Enabled = not screenGui.Enabled
+        gui.Enabled = not gui.Enabled
     end
+end)
+
+closeBtn.MouseButton1Click:Connect(function()
+    gui.Enabled = false
 end)
