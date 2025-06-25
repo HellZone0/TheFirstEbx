@@ -176,6 +176,74 @@ MinimizeButton.MouseButton1Click:Connect(function()
     )
 end)
 
+-- Tambahkan fitur cheat untuk tab "AFK / Farm"
+
+local function createToggle(parent, labelText, callback) local ToggleFrame = Instance.new("Frame") ToggleFrame.Size = UDim2.new(1, -20, 0, 30) ToggleFrame.BackgroundTransparency = 1 ToggleFrame.Parent = parent
+
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(0, 100, 1, 0)
+ToggleButton.Position = UDim2.new(1, -100, 0, 0)
+ToggleButton.Text = "OFF"
+ToggleButton.Font = Enum.Font.Gotham
+ToggleButton.TextSize = 14
+ToggleButton.BackgroundColor3 = Color3.fromRGB(100, 40, 40)
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.Parent = ToggleFrame
+Instance.new("UICorner", ToggleButton).CornerRadius = UDim.new(0, 6)
+
+local Label = Instance.new("TextLabel")
+Label.Size = UDim2.new(1, -110, 1, 0)
+Label.Position = UDim2.new(0, 10, 0, 0)
+Label.Text = labelText
+Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+Label.BackgroundTransparency = 1
+Label.Font = Enum.Font.Gotham
+Label.TextSize = 14
+Label.TextXAlignment = Enum.TextXAlignment.Left
+Label.Parent = ToggleFrame
+
+local toggled = false
+ToggleButton.MouseButton1Click:Connect(function()
+    toggled = not toggled
+    ToggleButton.Text = toggled and "ON" or "OFF"
+    ToggleButton.BackgroundColor3 = toggled and Color3.fromRGB(40, 100, 40) or Color3.fromRGB(100, 40, 40)
+    if callback then
+        callback(toggled)
+    end
+end)
+
+end
+
+-- Tab Farm
+createToggle(AFKTab, "Auto Farm", function(state)
+    print("Auto Farm:", state)
+    -- Tambahkan logika autofarm di sini
+end)
+
+createToggle(AFKTab, "Auto Collect Tokens", function(state)
+    print("Auto Collect Tokens:", state)
+    -- Tambahkan logika pengumpulan token otomatis di sini
+end)
+
+createToggle(AFKTab, "Auto Sprinkler", function(state)
+    print("Auto Sprinkler:", state)
+    -- Tambahkan logika auto sprinkler
+end)
+
+createToggle(AFKTab, "Auto Dispenser", function(state)
+    print("Auto Dispenser:", state)
+    -- Tambahkan logika penggunaan dispenser
+end)
+
+createToggle(AFKTab, "Auto Planter", function(state)
+    print("Auto Planter:", state)
+    -- Tambahkan logika planter otomatis
+end)
+
+end
+
+
+
 -- Close Logic
 CloseButton.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
