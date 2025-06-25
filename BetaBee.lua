@@ -1,17 +1,4 @@
 
-
---[[
-
-█████╗ ███╗   ██╗██████╗ ██████╗  ██████╗ ███╗   ███╗███████╗██████╗  █████╗ 
-██╔══██╗████╗  ██║██╔══██╗██╔══██╗██╔═══██╗████╗ ████║██╔════╝██╔══██╗██╔══██╗
-███████║██╔██╗ ██║██║  ██║██████╔╝██║   ██║██╔████╔██║█████╗  ██║  ██║███████║
-██╔══██║██║╚██╗██║██║  ██║██╔══██╗██║   ██║██║╚██╔╝██║██╔══╝  ██║  ██║██╔══██║
-██║  ██║██║ ╚████║██████╔╝██║  ██║╚██████╔╝██║ ╚═╝ ██║███████╗██████╔╝██║  ██║
-╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚═╝╚══════╝╚═════╝ ╚═╝  ╚═╝
-                                                                              
-]]--
-
-
 -- API CALLS
 local api = loadstring(game:HttpGet("https://cdn.jsdelivr.net/gh/liyunlon008/lua@main/API/andromeda_api.lua"))()
 local library = api.returncode("https://cdn.jsdelivr.net/gh/liyunlon008/lua@main/API/bracketv3.lua")
@@ -666,14 +653,7 @@ function makequests()
 end
 
 local Config = { WindowName = "🌌  andromeda | "..temptable.version, Color = Color3.fromRGB(255, 184, 65), Keybind = Enum.KeyCode.Semicolon}
-local Window = library:CreateWindow({
-    Name = Config.WindowName,
-    Size = UDim2.new(0, 380, 0, 320),
-    Theme = "Dark",
-    MinimizeKey = Config.Keybind,
-    CanDrag = true,
-    CloseButton = true
-}, game:GetService("CoreGui"))
+local Window = library:CreateWindow(Config, game:GetService("CoreGui"))
 
 local hometab = Window:CreateTab("Home")
 local farmtab = Window:CreateTab("AFK")
@@ -810,6 +790,16 @@ dispsettings:CreateToggle("山顶助推器", nil,  function(State) andromeda.dis
 dispsettings:CreateToggle("Blue Field Booster", nil,  function(State) andromeda.dispensesettings.blue = not andromeda.dispensesettings.blue end)
 dispsettings:CreateToggle("Red Field Booster", nil,  function(State) andromeda.dispensesettings.red = not andromeda.dispensesettings.red end)
 local guisettings = setttab:CreateSection("GUI Settings")
+
+guisettings:CreateLabel("") -- Spacer for better padding
+guisettings:CreateButton("▼ Minimize UI", function()
+    Window:Toggle(false)
+end)
+
+guisettings:CreateButton("▲ Show UI", function()
+    Window:Toggle(true)
+end)
+
 guisettings:CreateButton("Minimize UI", function()
     Window:Toggle(false)
 end)
