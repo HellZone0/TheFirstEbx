@@ -143,7 +143,7 @@ for _, tab in ipairs(tabs) do
 end
 
 -- Default tab
-switchTab("AFK / Farm")
+switchTab("Farm")
 
 -- Minimize/Close Logic
 local isMinimized = false
