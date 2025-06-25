@@ -149,22 +149,23 @@ switchTab("AFK / Farm")
 
 -- Minimize/Close logic
 local isMinimized = false
-local originalSize = MainFrame.Size
-local originalPosition = MainFrame.Position
-
 MinimizeButton.MouseButton1Click:Connect(function()
     isMinimized = not isMinimized
-
+    ContentFrame.Visible = not isMinimized
+    Tabs.Visible = not isMinimized
     if isMinimized then
-        ContentFrame.Visible = false
-        Tabs.Visible = false
-        MainFrame:TweenSize(UDim2.new(0, 520, 0, 40), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.3, true)
+        MainFrame.Size = UDim2.new(0, 500, 0, 40)
     else
-        ContentFrame.Visible = true
-        Tabs.Visible = true
-        MainFrame:TweenSize(originalSize, Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.3, true)
+        MainFrame.Size = UDim2.new(0, 500, 0, 400)
     end
 end)
+
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+print("✅ Andromeda modern UI loaded. Ready to populate with features.")
+
 
 CloseButton.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
