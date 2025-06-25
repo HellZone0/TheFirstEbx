@@ -1,10 +1,394 @@
-
 -- API CALLS
 local api = loadstring(game:HttpGet("https://cdn.jsdelivr.net/gh/liyunlon008/lua@main/API/andromeda_api.lua"))()
 local library = api.returncode("https://cdn.jsdelivr.net/gh/liyunlon008/lua@main/API/bracketv3.lua")
 local bssapi = api.returncode("https://cdn.jsdelivr.net/gh/liyunlon008/lua@main/BSS/bssapi.lua")
 
 if not isfolder("andromeda") then makefolder("andromeda") end
+
+
+
+
+
+-- UI UTAMA
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "AndromedaMobileUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.IgnoreGuiInset = true
+ScreenGui.Parent = game:GetService("CoreGui")
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 300, 0, 400)
+mainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.BorderSizePixel = 0
+mainFrame.Visible = true
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = mainFrame
+
+-- TITLE
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 40)
+title.BackgroundTransparency = 1
+title.Text = "🐝 Andromeda BSS Controller"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 16
+title.Parent = mainFrame
+
+-- MINIMIZE BUTTON
+local minimizeBtn = Instance.new("TextButton")
+minimizeBtn.Size = UDim2.new(0, 24, 0, 24)
+minimizeBtn.Position = UDim2.new(1, -58, 0, 8)
+minimizeBtn.Text = "-"
+minimizeBtn.Font = Enum.Font.GothamBold
+minimizeBtn.TextSize = 18
+minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+minimizeBtn.Parent = mainFrame
+
+-- CLOSE BUTTON
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 24, 0, 24)
+closeBtn.Position = UDim2.new(1, -30, 0, 8)
+closeBtn.Text = "X"
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 16
+closeBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+closeBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+closeBtn.Parent = mainFrame
+
+-- OPEN BUTTON (Hanya muncul saat UI disembunyikan)
+local openBtn = Instance.new("TextButton")
+openBtn.Size = UDim2.new(0, 120, 0, 40)
+openBtn.Position = UDim2.new(0.5, -60, 0, 10)
+openBtn.Text = "Open Andromeda UI"
+openBtn.Visible = false
+openBtn.Font = Enum.Font.Gotham
+openBtn.TextSize = 16
+openBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+openBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+openBtn.Parent = ScreenGui
+
+-- MINIMIZE ACTION
+minimizeBtn.MouseButton1Click:Connect(function()
+    for _, v in pairs(mainFrame:GetChildren()) do
+        if not v:IsA("TextButton") and not v:IsA("TextLabel") then
+            v.Visible = not v.Visible
+        end
+    end
+end)
+
+-- CLOSE ACTION
+closeBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+    openBtn.Visible = true
+end)
+
+-- OPEN ACTION
+openBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = true
+    openBtn.Visible = false
+end)
+
+
+-- TOGGLE FITUR
+local toggles = {}
+local yOffset = 50
+
+
+toggles.auto_farm = false
+
+local auto_farm_label = Instance.new("TextLabel")
+auto_farm_label.Size = UDim2.new(0, 180, 0, 24)
+auto_farm_label.Position = UDim2.new(0, 10, 0, yOffset)
+auto_farm_label.BackgroundTransparency = 1
+auto_farm_label.Text = "Auto Farm"
+auto_farm_label.TextColor3 = Color3.fromRGB(255, 255, 255)
+auto_farm_label.TextXAlignment = Enum.TextXAlignment.Left
+auto_farm_label.Font = Enum.Font.Gotham
+auto_farm_label.TextSize = 14
+auto_farm_label.Parent = mainFrame
+
+local auto_farm_button = Instance.new("TextButton")
+auto_farm_button.Size = UDim2.new(0, 80, 0, 24)
+auto_farm_button.Position = UDim2.new(0, 200, 0, yOffset)
+auto_farm_button.Text = "OFF"
+auto_farm_button.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+auto_farm_button.TextColor3 = Color3.fromRGB(255, 255, 255)
+auto_farm_button.Font = Enum.Font.GothamBold
+auto_farm_button.TextSize = 14
+auto_farm_button.Parent = mainFrame
+
+auto_farm_button.MouseButton1Click:Connect(function()
+    toggles.auto_farm = not toggles.auto_farm
+    if toggles.auto_farm then
+        auto_farm_button.Text = "ON"
+        auto_farm_button.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
+    else
+        auto_farm_button.Text = "OFF"
+        auto_farm_button.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+    end
+end)
+
+yOffset = yOffset + 30
+
+toggles.auto_quest = false
+
+local auto_quest_label = Instance.new("TextLabel")
+auto_quest_label.Size = UDim2.new(0, 180, 0, 24)
+auto_quest_label.Position = UDim2.new(0, 10, 0, yOffset)
+auto_quest_label.BackgroundTransparency = 1
+auto_quest_label.Text = "Auto Quest"
+auto_quest_label.TextColor3 = Color3.fromRGB(255, 255, 255)
+auto_quest_label.TextXAlignment = Enum.TextXAlignment.Left
+auto_quest_label.Font = Enum.Font.Gotham
+auto_quest_label.TextSize = 14
+auto_quest_label.Parent = mainFrame
+
+local auto_quest_button = Instance.new("TextButton")
+auto_quest_button.Size = UDim2.new(0, 80, 0, 24)
+auto_quest_button.Position = UDim2.new(0, 200, 0, yOffset)
+auto_quest_button.Text = "OFF"
+auto_quest_button.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+auto_quest_button.TextColor3 = Color3.fromRGB(255, 255, 255)
+auto_quest_button.Font = Enum.Font.GothamBold
+auto_quest_button.TextSize = 14
+auto_quest_button.Parent = mainFrame
+
+auto_quest_button.MouseButton1Click:Connect(function()
+    toggles.auto_quest = not toggles.auto_quest
+    if toggles.auto_quest then
+        auto_quest_button.Text = "ON"
+        auto_quest_button.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
+    else
+        auto_quest_button.Text = "OFF"
+        auto_quest_button.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+    end
+end)
+
+yOffset = yOffset + 30
+
+toggles.auto_dispenser = false
+
+local auto_dispenser_label = Instance.new("TextLabel")
+auto_dispenser_label.Size = UDim2.new(0, 180, 0, 24)
+auto_dispenser_label.Position = UDim2.new(0, 10, 0, yOffset)
+auto_dispenser_label.BackgroundTransparency = 1
+auto_dispenser_label.Text = "Auto Dispenser"
+auto_dispenser_label.TextColor3 = Color3.fromRGB(255, 255, 255)
+auto_dispenser_label.TextXAlignment = Enum.TextXAlignment.Left
+auto_dispenser_label.Font = Enum.Font.Gotham
+auto_dispenser_label.TextSize = 14
+auto_dispenser_label.Parent = mainFrame
+
+local auto_dispenser_button = Instance.new("TextButton")
+auto_dispenser_button.Size = UDim2.new(0, 80, 0, 24)
+auto_dispenser_button.Position = UDim2.new(0, 200, 0, yOffset)
+auto_dispenser_button.Text = "OFF"
+auto_dispenser_button.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+auto_dispenser_button.TextColor3 = Color3.fromRGB(255, 255, 255)
+auto_dispenser_button.Font = Enum.Font.GothamBold
+auto_dispenser_button.TextSize = 14
+auto_dispenser_button.Parent = mainFrame
+
+auto_dispenser_button.MouseButton1Click:Connect(function()
+    toggles.auto_dispenser = not toggles.auto_dispenser
+    if toggles.auto_dispenser then
+        auto_dispenser_button.Text = "ON"
+        auto_dispenser_button.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
+    else
+        auto_dispenser_button.Text = "OFF"
+        auto_dispenser_button.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+    end
+end)
+
+yOffset = yOffset + 30
+
+toggles.auto_field_boost = false
+
+local auto_field_boost_label = Instance.new("TextLabel")
+auto_field_boost_label.Size = UDim2.new(0, 180, 0, 24)
+auto_field_boost_label.Position = UDim2.new(0, 10, 0, yOffset)
+auto_field_boost_label.BackgroundTransparency = 1
+auto_field_boost_label.Text = "Auto Field Boost"
+auto_field_boost_label.TextColor3 = Color3.fromRGB(255, 255, 255)
+auto_field_boost_label.TextXAlignment = Enum.TextXAlignment.Left
+auto_field_boost_label.Font = Enum.Font.Gotham
+auto_field_boost_label.TextSize = 14
+auto_field_boost_label.Parent = mainFrame
+
+local auto_field_boost_button = Instance.new("TextButton")
+auto_field_boost_button.Size = UDim2.new(0, 80, 0, 24)
+auto_field_boost_button.Position = UDim2.new(0, 200, 0, yOffset)
+auto_field_boost_button.Text = "OFF"
+auto_field_boost_button.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+auto_field_boost_button.TextColor3 = Color3.fromRGB(255, 255, 255)
+auto_field_boost_button.Font = Enum.Font.GothamBold
+auto_field_boost_button.TextSize = 14
+auto_field_boost_button.Parent = mainFrame
+
+auto_field_boost_button.MouseButton1Click:Connect(function()
+    toggles.auto_field_boost = not toggles.auto_field_boost
+    if toggles.auto_field_boost then
+        auto_field_boost_button.Text = "ON"
+        auto_field_boost_button.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
+    else
+        auto_field_boost_button.Text = "OFF"
+        auto_field_boost_button.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+    end
+end)
+
+yOffset = yOffset + 30
+
+toggles.auto_planters = false
+
+local auto_planters_label = Instance.new("TextLabel")
+auto_planters_label.Size = UDim2.new(0, 180, 0, 24)
+auto_planters_label.Position = UDim2.new(0, 10, 0, yOffset)
+auto_planters_label.BackgroundTransparency = 1
+auto_planters_label.Text = "Auto Planters"
+auto_planters_label.TextColor3 = Color3.fromRGB(255, 255, 255)
+auto_planters_label.TextXAlignment = Enum.TextXAlignment.Left
+auto_planters_label.Font = Enum.Font.Gotham
+auto_planters_label.TextSize = 14
+auto_planters_label.Parent = mainFrame
+
+local auto_planters_button = Instance.new("TextButton")
+auto_planters_button.Size = UDim2.new(0, 80, 0, 24)
+auto_planters_button.Position = UDim2.new(0, 200, 0, yOffset)
+auto_planters_button.Text = "OFF"
+auto_planters_button.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+auto_planters_button.TextColor3 = Color3.fromRGB(255, 255, 255)
+auto_planters_button.Font = Enum.Font.GothamBold
+auto_planters_button.TextSize = 14
+auto_planters_button.Parent = mainFrame
+
+auto_planters_button.MouseButton1Click:Connect(function()
+    toggles.auto_planters = not toggles.auto_planters
+    if toggles.auto_planters then
+        auto_planters_button.Text = "ON"
+        auto_planters_button.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
+    else
+        auto_planters_button.Text = "OFF"
+        auto_planters_button.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+    end
+end)
+
+yOffset = yOffset + 30
+
+toggles.auto_sprout = false
+
+local auto_sprout_label = Instance.new("TextLabel")
+auto_sprout_label.Size = UDim2.new(0, 180, 0, 24)
+auto_sprout_label.Position = UDim2.new(0, 10, 0, yOffset)
+auto_sprout_label.BackgroundTransparency = 1
+auto_sprout_label.Text = "Auto Sprout"
+auto_sprout_label.TextColor3 = Color3.fromRGB(255, 255, 255)
+auto_sprout_label.TextXAlignment = Enum.TextXAlignment.Left
+auto_sprout_label.Font = Enum.Font.Gotham
+auto_sprout_label.TextSize = 14
+auto_sprout_label.Parent = mainFrame
+
+local auto_sprout_button = Instance.new("TextButton")
+auto_sprout_button.Size = UDim2.new(0, 80, 0, 24)
+auto_sprout_button.Position = UDim2.new(0, 200, 0, yOffset)
+auto_sprout_button.Text = "OFF"
+auto_sprout_button.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+auto_sprout_button.TextColor3 = Color3.fromRGB(255, 255, 255)
+auto_sprout_button.Font = Enum.Font.GothamBold
+auto_sprout_button.TextSize = 14
+auto_sprout_button.Parent = mainFrame
+
+auto_sprout_button.MouseButton1Click:Connect(function()
+    toggles.auto_sprout = not toggles.auto_sprout
+    if toggles.auto_sprout then
+        auto_sprout_button.Text = "ON"
+        auto_sprout_button.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
+    else
+        auto_sprout_button.Text = "OFF"
+        auto_sprout_button.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+    end
+end)
+
+yOffset = yOffset + 30
+
+toggles.auto_puffshroom = false
+
+local auto_puffshroom_label = Instance.new("TextLabel")
+auto_puffshroom_label.Size = UDim2.new(0, 180, 0, 24)
+auto_puffshroom_label.Position = UDim2.new(0, 10, 0, yOffset)
+auto_puffshroom_label.BackgroundTransparency = 1
+auto_puffshroom_label.Text = "Auto Puffshroom"
+auto_puffshroom_label.TextColor3 = Color3.fromRGB(255, 255, 255)
+auto_puffshroom_label.TextXAlignment = Enum.TextXAlignment.Left
+auto_puffshroom_label.Font = Enum.Font.Gotham
+auto_puffshroom_label.TextSize = 14
+auto_puffshroom_label.Parent = mainFrame
+
+local auto_puffshroom_button = Instance.new("TextButton")
+auto_puffshroom_button.Size = UDim2.new(0, 80, 0, 24)
+auto_puffshroom_button.Position = UDim2.new(0, 200, 0, yOffset)
+auto_puffshroom_button.Text = "OFF"
+auto_puffshroom_button.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+auto_puffshroom_button.TextColor3 = Color3.fromRGB(255, 255, 255)
+auto_puffshroom_button.Font = Enum.Font.GothamBold
+auto_puffshroom_button.TextSize = 14
+auto_puffshroom_button.Parent = mainFrame
+
+auto_puffshroom_button.MouseButton1Click:Connect(function()
+    toggles.auto_puffshroom = not toggles.auto_puffshroom
+    if toggles.auto_puffshroom then
+        auto_puffshroom_button.Text = "ON"
+        auto_puffshroom_button.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
+    else
+        auto_puffshroom_button.Text = "OFF"
+        auto_puffshroom_button.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+    end
+end)
+
+yOffset = yOffset + 30
+
+toggles.auto_kill_mobs = false
+
+local auto_kill_mobs_label = Instance.new("TextLabel")
+auto_kill_mobs_label.Size = UDim2.new(0, 180, 0, 24)
+auto_kill_mobs_label.Position = UDim2.new(0, 10, 0, yOffset)
+auto_kill_mobs_label.BackgroundTransparency = 1
+auto_kill_mobs_label.Text = "Auto Kill Mobs"
+auto_kill_mobs_label.TextColor3 = Color3.fromRGB(255, 255, 255)
+auto_kill_mobs_label.TextXAlignment = Enum.TextXAlignment.Left
+auto_kill_mobs_label.Font = Enum.Font.Gotham
+auto_kill_mobs_label.TextSize = 14
+auto_kill_mobs_label.Parent = mainFrame
+
+local auto_kill_mobs_button = Instance.new("TextButton")
+auto_kill_mobs_button.Size = UDim2.new(0, 80, 0, 24)
+auto_kill_mobs_button.Position = UDim2.new(0, 200, 0, yOffset)
+auto_kill_mobs_button.Text = "OFF"
+auto_kill_mobs_button.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+auto_kill_mobs_button.TextColor3 = Color3.fromRGB(255, 255, 255)
+auto_kill_mobs_button.Font = Enum.Font.GothamBold
+auto_kill_mobs_button.TextSize = 14
+auto_kill_mobs_button.Parent = mainFrame
+
+auto_kill_mobs_button.MouseButton1Click:Connect(function()
+    toggles.auto_kill_mobs = not toggles.auto_kill_mobs
+    if toggles.auto_kill_mobs then
+        auto_kill_mobs_button.Text = "ON"
+        auto_kill_mobs_button.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
+    else
+        auto_kill_mobs_button.Text = "OFF"
+        auto_kill_mobs_button.BackgroundColor3 = Color3.fromRGB(120, 0, 0)
+    end
+end)
+
+yOffset = yOffset + 30
+
 
 
 -- Script temporary variables
@@ -1249,3 +1633,383 @@ if _G.autoload then if isfile("andromeda/BSS_".._G.autoload..".json") then andro
 for _, part in next, workspace:FindFirstChild("FieldDecos"):GetDescendants() do if part:IsA("BasePart") then part.CanCollide = false part.Transparency = part.Transparency < 0.5 and 0.5 or part.Transparency task.wait() end end
 for _, part in next, workspace:FindFirstChild("Decorations"):GetDescendants() do if part:IsA("BasePart") and (part.Parent.Name == "Bush" or part.Parent.Name == "Blue Flower") then part.CanCollide = false part.Transparency = part.Transparency < 0.5 and 0.5 or part.Transparency task.wait() end end
 for i,v in next, workspace.Decorations.Misc:GetDescendants() do if v.Parent.Name == "Mushroom" then v.CanCollide = false v.Transparency = 0.5 end end
+
+
+
+-- LOOP KONTROL UNTUK FITUR UTAMA
+spawn(function()
+    while task.wait(1) do
+        if toggles.auto_farm then
+            pcall(function()
+                -- Panggil fungsi Auto Farm
+                if _G.StartAutoFarm then _G.StartAutoFarm() end
+            end)
+        end
+        if toggles.auto_quest then
+            pcall(function()
+                if _G.StartAutoQuest then _G.StartAutoQuest() end
+            end)
+        end
+        if toggles.auto_dispenser then
+            pcall(function()
+                if _G.StartAutoDispenser then _G.StartAutoDispenser() end
+            end)
+        end
+        if toggles.auto_field_boost then
+            pcall(function()
+                if _G.StartAutoFieldBoost then _G.StartAutoFieldBoost() end
+            end)
+        end
+        if toggles.auto_planters then
+            pcall(function()
+                if _G.StartAutoPlanters then _G.StartAutoPlanters() end
+            end)
+        end
+        if toggles.auto_sprout then
+            pcall(function()
+                if _G.StartAutoSprout then _G.StartAutoSprout() end
+            end)
+        end
+        if toggles.auto_puffshroom then
+            pcall(function()
+                if _G.StartAutoPuffshroom then _G.StartAutoPuffshroom() end
+            end)
+        end
+        if toggles.auto_kill_mobs then
+            pcall(function()
+                if _G.StartAutoKillMobs then _G.StartAutoKillMobs() end
+            end)
+        end
+    end
+end)
+
+
+
+
+-- === FUNGSIONALITAS FITUR ===
+_G.StartAutoFarm = function()
+    spawn(function() while task.wait() do
+    if andromeda.toggles.autofarm then
+        --if andromeda.toggles.farmcoco then getcoco() end
+        --if andromeda.toggles.collectcrosshairs then getcrosshairs() end
+        if andromeda.toggles.farmflame then getflame() end
+        if andromeda.toggles.farmfuzzy then getfuzzy() end
+    end
+end end)
+end
+
+
+_G.StartAutoQuest = function()
+    spawn(function() while task.wait() do
+    if andromeda.toggles.autofarm then
+        temptable.magnitude = 70
+        if game.Players.LocalPlayer.Character:FindFirstChild("ProgressLabel",true) then
+        local pollenprglbl = game.Players.LocalPlayer.Character:FindFirstChild("ProgressLabel",true)
+        maxpollen = tonumber(pollenprglbl.Text:match("%d+$"))
+        local pollencount = game.Players.LocalPlayer.CoreStats.Pollen.Value
+        pollenpercentage = pollencount/maxpollen*100
+        fieldselected = game:GetService("Workspace").FlowerZones[andromeda.vars.field]
+        if andromeda.toggles.autodoquest and game:GetService("Players").LocalPlayer.PlayerGui.ScreenGui.Menus.Children.Quests.Content:FindFirstChild("Frame") then
+            for i,v in next, game:GetService("Players").LocalPlayer.PlayerGui.ScreenGui.Menus.Children.Quests:GetDescendants() do
+                if v.Name == "Description" then
+                    if string.match(v.Parent.Parent.TitleBar.Text, andromeda.vars.npcprefer) or andromeda.vars.npcprefer == "All Quests" and not string.find(v.Text, "Puffshroom") then
+                        pollentypes = {'White Pollen', "Red Pollen", "Blue Pollen", "Blue Flowers", "Red Flowers", "White Flowers"}
+                        text = v.Text
+                        if api.returnvalue(fieldstable, text) and not string.find(v.Text, "Complete!") and not api.findvalue(andromeda.blacklistedfields, api.returnvalue(fieldstable, text)) then
+                            d = api.returnvalue(fieldstable, text)
+                            fieldselected = game:GetService("Workspace").FlowerZones[d]
+                            break
+                        elseif api.returnvalue(pollentypes, text) and not string.find(v.Text, 'Complete!') then
+                            d = api.returnvalue(pollentypes, text)
+                            if d == "Blue Flowers" or d == "Blue Pollen" then
+                                fieldselected = game:GetService("Workspace").FlowerZones[andromeda.bestfields.blue]
+                                break
+                            elseif d == "White Flowers" or d == "White Pollen" then
+                                fieldselected = game:GetService("Workspace").FlowerZones[andromeda.bestfields.white]
+                                break
+                            elseif d == "Red Flowers" or d == "Red Pollen" then
+                                fieldselected = game:GetService("Workspace").FlowerZones[andromeda.bestfields.red]
+                                break
+                            end
+                        end
+                    end
+                end
+            end
+        else
+            fieldselected = game:GetService("Workspace").FlowerZones[andromeda.vars.field]
+        end
+        fieldpos = CFrame.new(fieldselected.Position.X, fieldselected.Position.Y+3, fieldselected.Position.Z)
+        fieldposition = fieldselected.Position
+        if temptable.sprouts.detected and temptable.sprouts.coords and andromeda.toggles.farmsprouts then
+            fieldposition = temptable.sprouts.coords.Position
+            fieldpos = temptable.sprouts.coords
+        end
+        if andromeda.toggles.farmpuffshrooms and game.Workspace.Happenings.Puffshrooms:FindFirstChildOfClass("Model") then 
+            if api.partwithnamepart("Mythic", game.Workspace.Happenings.Puffshrooms) then
+                temptable.magnitude = 25 
+                fieldpos = api.partwithnamepart("Mythic", game.Workspace.Happenings.Puffshrooms):FindFirstChild("Puffball Stem").CFrame
+                fieldposition = fieldpos.Position
+            elseif api.partwithnamepart("Legendary", game.Workspace.Happenings.Puffshrooms) then
+                temptable.magnitude = 25 
+                fieldpos = api.partwithnamepart("Legendary", game.Workspace.Happenings.Puffshrooms):FindFirstChild("Puffball Stem").CFrame
+                fieldposition = fieldpos.Position
+            elseif api.partwithnamepart("Epic", game.Workspace.Happenings.Puffshrooms) then
+                temptable.magnitude = 25 
+                fieldpos = api.partwithnamepart("Epic", game.Workspace.Happenings.Puffshrooms):FindFirstChild("Puffball Stem").CFrame
+                fieldposition = fieldpos.Position
+            elseif api.partwithnamepart("Rare", game.Workspace.Happenings.Puffshrooms) then
+                temptable.magnitude = 25 
+                fieldpos = api.partwithnamepart("Rare", game.Workspace.Happenings.Puffshrooms):FindFirstChild("Puffball Stem").CFrame
+                fieldposition = fieldpos.Position
+            else
+                temptable.magnitude = 25 
+                fieldpos = api.getbiggestmodel(game.Workspace.Happenings.Puffshrooms):FindFirstChild("Puffball Stem").CFrame
+                fieldposition = fieldpos.Position
+            end
+        end
+        if tonumber(pollenpercentage) < tonumber(andromeda.vars.convertat) then
+            if not temptable.tokensfarm then
+                api.tween(2, fieldpos)
+                task.wait(2)
+                temptable.tokensfarm = true
+                if andromeda.toggles.autosprinkler then makesprinklers() end
+            else
+                if andromeda.toggles.killmondo then
+                    while andromeda.toggles.killmondo and game.Workspace.Monsters:FindFirstChild("Mondo Chick (Lvl 8)") and not temptable.started.vicious and not temptable.started.monsters do
+                        temptable.started.mondo = true
+                        while game.Workspace.Monsters:FindFirstChild("Mondo Chick (Lvl 8)") do
+                            disableall()
+                            game:GetService("Workspace").Map.Ground.HighBlock.CanCollide = false 
+                            mondopition = game.Workspace.Monsters["Mondo Chick (Lvl 8)"].Head.Position
+                            api.tween(1, CFrame.new(mondopition.x, mondopition.y - 60, mondopition.z))
+                            task.wait(1)
+                            temptable.float = true
+                        end
+                        task.wait(.5) game:GetService("Workspace").Map.Ground.HighBlock.CanCollide = true temptable.float = false api.tween(.5, CFrame.new(73.2, 176.35, -167)) task.wait(1)
+                        for i = 0, 50 do 
+                            gettoken(CFrame.new(73.2, 176.35, -167).Position) 
+                        end 
+                        enableall() 
+                        api.tween(2, fieldpos) 
+                        temptable.started.mondo = false
+                    end
+                end
+                if (fieldposition-game.Players.LocalPlayer.Character.HumanoidRootPart.Position).magnitude > temptable.magnitude then
+                    api.tween(2, fieldpos)
+                    task.wait(2)
+                    if andromeda.toggles.autosprinkler then makesprinklers() end
+                end
+                getprioritytokens()
+                if andromeda.toggles.avoidmobs then avoidmob() end
+                if andromeda.toggles.farmclosestleaf then closestleaf() end
+                if andromeda.toggles.farmbubbles then getbubble() end
+                if andromeda.toggles.farmclouds then getcloud() end
+                if andromeda.toggles.farmunderballoons then getballoons() end
+                if not andromeda.toggles.donotfarmtokens and done then gettoken() end
+                if not andromeda.toggles.farmflower then getflower() end
+            end
+        elseif tonumber(pollenpercentage) >= tonumber(andromeda.vars.convertat) then
+            temptable.tokensfarm = false
+            api.tween(2, game:GetService("Players").LocalPlayer.SpawnPos.Value * CFrame.fromEulerAnglesXYZ(0, 110, 0) + Vector3.new(0, 0, 9))
+            task.wait(2)
+            temptable.converting = true
+            repeat
+                converthoney()
+            until game.Players.LocalPlayer.CoreStats.Pollen.Value == 0
+            if andromeda.toggles.convertballoons and gethiveballoon() then
+                task.wait(6)
+                repeat
+                    task.wait()
+                    converthoney()
+                until gethiveballoon() == false or not andromeda.toggles.convertballoons
+            end
+            temptable.converting = false
+            temptable.act = temptable.act + 1
+            task.wait(6)
+            if andromeda.toggles.autoant and not game:GetService("Workspace").Toys["Ant Challenge"].Busy.Value and rtsg().Eggs.AntPass > 0 then farmant() end
+            if andromeda.toggles.autoquest then makequests() end
+            if andromeda.toggles.autoplanters then collectplanters() end
+            if andromeda.toggles.autokillmobs then 
+                if temptable.act >= andromeda.vars.monstertimer then
+                    temptable.started.monsters = true
+                    temptable.act = 0
+                    killmobs() 
+                    temptable.started.monsters = false
+                end
+            end
+        end
+    end
+end end end)
+end
+
+
+_G.StartAutoDispenser = function()
+    spawn(function()
+    while task.wait(1) do
+		if andromeda.toggles.killvicious and temptable.detected.vicious and temptable.converting == false and not temptable.started.monsters then
+            temptable.started.vicious = true
+            disableall()
+			local vichumanoid = game:GetService("Players").LocalPlayer.Character.HumanoidRootPart
+			for i,v in next, game.workspace.Particles:GetChildren() do
+				for x in string.gmatch(v.Name, "Vicious") do
+					if string.find(v.Name, "Vicious") then
+						api.tween(1,CFrame.new(v.Position.x, v.Position.y, v.Position.z)) task.wait(1)
+						api.tween(0.5, CFrame.new(v.Position.x, v.Position.y, v.Position.z)) task.wait(.5)
+					end
+				end
+			end
+			for i,v in next, game.workspace.Particles:GetChildren() do
+				for x in string.gmatch(v.Name, "Vicious") do
+                    while andromeda.toggles.killvicious and temptable.detected.vicious do task.wait() if string.find(v.Name, "Vicious") then
+                        for i=1, 4 do temptable.float = true vichumanoid.CFrame = CFrame.new(v.Position.x+10, v.Position.y, v.Position.z) task.wait(.3)
+                        end
+                    end end
+                end
+			end
+            enableall()
+			task.wait(1)
+			temptable.float = false
+            temptable.started.vicious = false
+		end
+	end
+end)
+end
+
+
+_G.StartAutoFieldBoost = function()
+    spawn(function() while task.wait() do
+    if andromeda.toggles.killwindy and temptable.detected.windy and not temptable.converting and not temptable.started.vicious and not temptable.started.mondo and not temptable.started.monsters then
+        temptable.started.windy = true
+        wlvl = "" aw = false awb = false -- some variable for autowindy, yk?
+        disableall()
+        while andromeda.toggles.killwindy and temptable.detected.windy do
+            if not aw then
+                for i,v in pairs(workspace.Monsters:GetChildren()) do
+                    if string.find(v.Name, "Windy") then wlvl = v.Name aw = true -- we found windy!
+                    end
+                end
+            end
+            if aw then
+                for i,v in pairs(workspace.Monsters:GetChildren()) do
+                    if string.find(v.Name, "Windy") then
+                        if v.Name ~= wlvl then
+                            temptable.float = false task.wait(5) for i =1, 5 do gettoken(api.humanoidrootpart().Position) end -- collect tokens :yessir:
+                            wlvl = v.Name
+                        end
+                    end
+                end
+            end
+            if not awb then api.tween(1,temptable.gacf(temptable.windy, 5)) task.wait(1) awb = true end
+            if awb and temptable.windy.Name == "Windy" then
+                api.humanoidrootpart().CFrame = temptable.gacf(temptable.windy, 25) temptable.float = true task.wait()
+            end
+        end 
+        enableall()
+        temptable.float = false
+        temptable.started.windy = false
+    end
+end end)
+end
+
+
+_G.StartAutoPlanters = function()
+    spawn(function() while task.wait(0.001) do
+    if andromeda.toggles.traincrab then game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-259, 111.8, 496.4) * CFrame.fromEulerAnglesXYZ(0, 110, 90) temptable.float = true temptable.float = false end
+    if andromeda.toggles.farmrares then for k,v in next, game.workspace.Collectibles:GetChildren() do if v.CFrame.YVector.Y == 1 then if v.Transparency == 0 then decal = v:FindFirstChildOfClass("Decal") for e,r in next, andromeda.rares do if decal.Texture == r or decal.Texture == "rbxassetid://"..r then game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame break end end end end end end
+    if andromeda.toggles.autodig then workspace.NPCs.Onett.Onett["Porcelain Dipper"].ClickEvent:FireServer() if game.Players.LocalPlayer then if game.Players.LocalPlayer.Character then if game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool") then if game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool"):FindFirstChild("ClickEvent", true) then clickevent = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool"):FindFirstChild("ClickEvent", true) or nil end end end if clickevent then clickevent:FireServer() end end end
+end end)
+end
+
+
+_G.StartAutoSprout = function()
+    spawn(function() while task.wait(.1) do
+    if not temptable.converting then
+        if andromeda.toggles.autosamovar then
+            game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer("Samovar")
+            platformm = game:GetService("Workspace").Toys.Samovar.Platform
+            for i,v in pairs(game.Workspace.Collectibles:GetChildren()) do
+                if (v.Position-platformm.Position).magnitude < 25 and v.CFrame.YVector.Y == 1 then
+                    api.humanoidrootpart().CFrame = v.CFrame
+                end
+            end
+        end
+        if andromeda.toggles.autostockings then
+            game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer("Stockings")
+            platformm = game:GetService("Workspace").Toys.Stockings.Platform
+            for i,v in pairs(game.Workspace.Collectibles:GetChildren()) do
+                if (v.Position-platformm.Position).magnitude < 25 and v.CFrame.YVector.Y == 1 then
+                    api.humanoidrootpart().CFrame = v.CFrame
+                end
+            end
+        end
+        if andromeda.toggles.autoonettart then
+            game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer("Onett's Lid Art")
+            platformm = game:GetService("Workspace").Toys["Onett's Lid Art"].Platform
+            for i,v in pairs(game.Workspace.Collectibles:GetChildren()) do
+                if (v.Position-platformm.Position).magnitude < 25 and v.CFrame.YVector.Y == 1 then
+                    api.humanoidrootpart().CFrame = v.CFrame
+                end
+            end
+        end
+        if andromeda.toggles.autocandles then
+            game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer("Honeyday Candles")
+            platformm = game:GetService("Workspace").Toys["Honeyday Candles"].Platform
+            for i,v in pairs(game.Workspace.Collectibles:GetChildren()) do
+                if (v.Position-platformm.Position).magnitude < 25 and v.CFrame.YVector.Y == 1 then
+                    api.humanoidrootpart().CFrame = v.CFrame
+                end
+            end
+        end
+        if andromeda.toggles.autofeast then
+            game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer("Beesmas Feast")
+            platformm = game:GetService("Workspace").Toys["Beesmas Feast"].Platform
+            for i,v in pairs(game.Workspace.Collectibles:GetChildren()) do
+                if (v.Position-platformm.Position).magnitude < 25 and v.CFrame.YVector.Y == 1 then
+                    api.humanoidrootpart().CFrame = v.CFrame
+                end
+            end
+        end
+    end
+end end)
+end
+
+
+_G.StartAutoPuffshroom = function()
+    spawn(function() while task.wait(1) do
+    temptable.runningfor = temptable.runningfor + 1
+    temptable.honeycurrent = statsget().Totals.Honey
+    if andromeda.toggles.honeystorm then game.ReplicatedStorage.Events.ToyEvent:FireServer("Honeystorm") end
+    if andromeda.toggles.collectgingerbreads then game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer("Gingerbread House") end
+    if andromeda.toggles.autodispense then
+        if andromeda.dispensesettings.rj then local A_1 = "Free Royal Jelly Dispenser" local Event = game:GetService("ReplicatedStorage").Events.ToyEvent Event:FireServer(A_1) end
+        if andromeda.dispensesettings.blub then game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer("Blueberry Dispenser") end
+        if andromeda.dispensesettings.straw then game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer("Strawberry Dispenser") end
+        if andromeda.dispensesettings.treat then game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer("Treat Dispenser") end
+        if andromeda.dispensesettings.coconut then game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer("Coconut Dispenser") end
+        if andromeda.dispensesettings.glue then game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer("Glue Dispenser") end
+    end
+    if andromeda.toggles.autoboosters then 
+        if andromeda.dispensesettings.white then game.ReplicatedStorage.Events.ToyEvent:FireServer("Field Booster") end
+        if andromeda.dispensesettings.red then game.ReplicatedStorage.Events.ToyEvent:FireServer("Red Field Booster") end
+        if andromeda.dispensesettings.blue then game.ReplicatedStorage.Events.ToyEvent:FireServer("Blue Field Booster") end
+    end
+    if andromeda.toggles.clock then game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer("Wealth Clock") end
+    if andromeda.toggles.freeantpass then game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer("Free Ant Pass Dispenser") end
+    gainedhoneylabel:UpdateText("Gained Honey: "..api.suffixstring(temptable.honeycurrent - temptable.honeystart))
+end end)
+end
+
+
+_G.StartAutoKillMobs = function()
+    spawn(function()while task.wait() do
+    if andromeda.toggles.farmsnowflakes then
+        task.wait(3)
+        for i,v in next, temptable.tokenpath:GetChildren() do
+            if v:FindFirstChildOfClass("Decal") and v:FindFirstChildOfClass("Decal").Texture == "rbxassetid://6087969886" and v.Transparency == 0 then
+                api.humanoidrootpart().CFrame = CFrame.new(v.Position.X, v.Position.Y+3, v.Position.Z)
+                break
+            end
+        end
+    end
+end end)
+end
