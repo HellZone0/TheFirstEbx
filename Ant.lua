@@ -1,7 +1,3 @@
--- File gabungan Fluent UI + Expedition Antarctica Script
---!strict
--- Fluent UI + Expedition Antarctica Trainer Script
--- By: ChatGPT - Gabungan full UI stylish dan modern
 
 -- >>> 1. Load Fluent UI Library
 local Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/yourusername/obiiyeuem1.lua"))()
