@@ -1,13 +1,12 @@
-
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- Clear old UI if needed
+-- Hapus UI sebelumnya jika ada
 local existing = PlayerGui:FindFirstChild("AndromedaUI")
 if existing then existing:Destroy() end
 
--- Main UI
+-- Buat UI
 local ScreenGui = Instance.new("ScreenGui", PlayerGui)
 ScreenGui.Name = "AndromedaUI"
 ScreenGui.ResetOnSpawn = false
@@ -16,12 +15,16 @@ local MainFrame = Instance.new("Frame", ScreenGui)
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 580, 0, 400)
 MainFrame.Position = UDim2.new(0.3, 0, 0.2, 0)
-MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
 MainFrame.BackgroundTransparency = 0.1
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
 MainFrame.Draggable = true
 MainFrame.ZIndex = 1
+
+-- Rounded corners
+local cornerMain = Instance.new("UICorner", MainFrame)
+cornerMain.CornerRadius = UDim.new(0, 14)
 
 -- TopBar
 local TopBar = Instance.new("Frame", MainFrame)
@@ -30,6 +33,9 @@ TopBar.Size = UDim2.new(1, 0, 0, 40)
 TopBar.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
 TopBar.BorderSizePixel = 0
 TopBar.ZIndex = 2
+
+local cornerTop = Instance.new("UICorner", TopBar)
+cornerTop.CornerRadius = UDim.new(0, 14)
 
 local Title = Instance.new("TextLabel", TopBar)
 Title.Text = "🛰 ANDROMEDA MODZ"
@@ -61,7 +67,7 @@ MinimizeButton.TextSize = 20
 MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 MinimizeButton.ZIndex = 3
 
--- Tabs
+-- Tabs bar
 local Tabs = Instance.new("Frame", MainFrame)
 Tabs.Name = "Tabs"
 Tabs.Size = UDim2.new(1, 0, 0, 40)
@@ -70,7 +76,6 @@ Tabs.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
 Tabs.BorderSizePixel = 0
 Tabs.ZIndex = 2
 
--- Content Area
 local ContentFrame = Instance.new("Frame", MainFrame)
 ContentFrame.Name = "ContentFrame"
 ContentFrame.Size = UDim2.new(1, 0, 1, -80)
@@ -81,7 +86,11 @@ ContentFrame.BorderSizePixel = 0
 ContentFrame.ZIndex = 2
 ContentFrame.ClipsDescendants = true
 
--- Enable mouse input
+-- Rounded corners for tabs and content
+Instance.new("UICorner", Tabs).CornerRadius = UDim.new(0, 12)
+Instance.new("UICorner", ContentFrame).CornerRadius = UDim.new(0, 12)
+
+-- Tombol aktif
 MainFrame.Selectable = true
 MainFrame.Active = true
 TopBar.Selectable = true
@@ -91,15 +100,15 @@ Tabs.Active = true
 ContentFrame.Selectable = true
 ContentFrame.Active = true
 
--- Minimize logic
+-- Fungsi Minimize
 local minimized = false
 MinimizeButton.MouseButton1Click:Connect(function()
 	minimized = not minimized
-	ContentFrame.Visible = not minimized
 	Tabs.Visible = not minimized
+	ContentFrame.Visible = not minimized
 end)
 
--- Close logic
+-- Fungsi Close
 CloseButton.MouseButton1Click:Connect(function()
 	ScreenGui:Destroy()
 end)
