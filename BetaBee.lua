@@ -1,43 +1,39 @@
--- Andromeda Bee Swarm Script - Modern UI Framework
--- Inspired by AI MODZ layout (multi-tab, toggleable, mobile-friendly)
+
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
--- Create UI Elements
+-- Buat UI
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "AndromedaUI"
 ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
+-- Main Frame
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
 MainFrame.Position = UDim2.new(0.3, 0, 0.2, 0)
 MainFrame.Size = UDim2.new(0, 520, 0, 420)
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
 MainFrame.Draggable = true
-MainFrame.BackgroundTransparency = 0.1
+MainFrame.BackgroundTransparency = 0
 MainFrame.ClipsDescendants = true
 MainFrame.ZIndex = 2
 
-local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 16)
-UICorner.Parent = MainFrame
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
 
 -- Top Bar
 local TopBar = Instance.new("Frame")
 TopBar.Name = "TopBar"
 TopBar.Parent = MainFrame
-TopBar.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
+TopBar.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
 TopBar.Size = UDim2.new(1, 0, 0, 40)
 TopBar.BorderSizePixel = 0
-
-local TopBarCorner = Instance.new("UICorner")
-TopBarCorner.CornerRadius = UDim.new(0, 12)
-TopBarCorner.Parent = TopBar
+Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0, 12)
 
 local Title = Instance.new("TextLabel")
 Title.Name = "Title"
@@ -51,6 +47,7 @@ Title.Size = UDim2.new(0.6, 0, 1, 0)
 Title.BackgroundTransparency = 1
 Title.TextXAlignment = Enum.TextXAlignment.Left
 
+-- Tombol Close
 local CloseButton = Instance.new("TextButton")
 CloseButton.Name = "CloseButton"
 CloseButton.Parent = TopBar
@@ -62,6 +59,7 @@ CloseButton.Size = UDim2.new(0, 40, 1, 0)
 CloseButton.Position = UDim2.new(1, -40, 0, 0)
 CloseButton.BackgroundTransparency = 1
 
+-- Tombol Minimize
 local MinimizeButton = Instance.new("TextButton")
 MinimizeButton.Name = "MinimizeButton"
 MinimizeButton.Parent = TopBar
@@ -79,7 +77,7 @@ Tabs.Name = "Tabs"
 Tabs.Parent = MainFrame
 Tabs.Position = UDim2.new(0, 0, 0, 40)
 Tabs.Size = UDim2.new(1, 0, 0, 40)
-Tabs.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
+Tabs.BackgroundColor3 = Color3.fromRGB(45, 45, 65)
 Tabs.BorderSizePixel = 0
 
 local TabsLayout = Instance.new("UIListLayout")
@@ -93,7 +91,8 @@ ContentFrame.Name = "ContentFrame"
 ContentFrame.Parent = MainFrame
 ContentFrame.Position = UDim2.new(0, 0, 0, 80)
 ContentFrame.Size = UDim2.new(1, 0, 1, -80)
-ContentFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+ContentFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
+ContentFrame.BackgroundTransparency = 0.05
 ContentFrame.BorderSizePixel = 0
 
 -- Tabs Setup
@@ -122,13 +121,16 @@ for _, tab in ipairs(tabs) do
     TabButton.Font = Enum.Font.Gotham
     TabButton.TextSize = 12
     TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    TabButton.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+    TabButton.BackgroundColor3 = Color3.fromRGB(55, 55, 75)
     TabButton.Size = UDim2.new(1/#tabs, 0, 1, 0)
+    TabButton.TextWrapped = true
+    TabButton.TextYAlignment = Enum.TextYAlignment.Center
+    TabButton.TextXAlignment = Enum.TextXAlignment.Center
     TabButton.AutoButtonColor = true
+    TabButton.BackgroundTransparency = 0.1
 
-    local Corner = Instance.new("UICorner")
+    local Corner = Instance.new("UICorner", TabButton)
     Corner.CornerRadius = UDim.new(0, 8)
-    Corner.Parent = TabButton
 
     local Content = Instance.new("Frame")
     Content.Name = tab.Name
@@ -142,15 +144,15 @@ for _, tab in ipairs(tabs) do
     end)
 end
 
--- Default tab
+-- Tampilkan default tab
 switchTab("AFK / Farm")
 
--- Minimize/Close Logic
+-- Minimize/Close logic
 local isMinimized = false
 MinimizeButton.MouseButton1Click:Connect(function()
     isMinimized = not isMinimized
-    ContentFrame.Visible = not isMinimized
     Tabs.Visible = not isMinimized
+    ContentFrame.Visible = not isMinimized
 end)
 
 CloseButton.MouseButton1Click:Connect(function()
