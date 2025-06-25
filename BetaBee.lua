@@ -1,9 +1,7 @@
-
-
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
--- Buat UI
+-- UI Base
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "AndromedaUI"
 ScreenGui.ResetOnSpawn = false
@@ -15,22 +13,38 @@ local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+MainFrame.BackgroundTransparency = 0.2
 MainFrame.Position = UDim2.new(0.3, 0, 0.2, 0)
 MainFrame.Size = UDim2.new(0, 520, 0, 420)
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
 MainFrame.Draggable = true
-MainFrame.BackgroundTransparency = 0
 MainFrame.ClipsDescendants = true
 MainFrame.ZIndex = 2
 
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
+
+-- Shadow effect
+local shadow = Instance.new("ImageLabel")
+shadow.Name = "Shadow"
+shadow.Parent = MainFrame
+shadow.AnchorPoint = Vector2.new(0.5, 0.5)
+shadow.Position = UDim2.new(0.5, 0, 0.5, 0)
+shadow.Size = UDim2.new(1, 60, 1, 60)
+shadow.BackgroundTransparency = 1
+shadow.Image = "rbxassetid://1316045217"
+shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+shadow.ImageTransparency = 0.8
+shadow.ScaleType = Enum.ScaleType.Slice
+shadow.SliceCenter = Rect.new(10, 10, 118, 118)
+shadow.ZIndex = 1
 
 -- Top Bar
 local TopBar = Instance.new("Frame")
 TopBar.Name = "TopBar"
 TopBar.Parent = MainFrame
 TopBar.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+TopBar.BackgroundTransparency = 0.1
 TopBar.Size = UDim2.new(1, 0, 0, 40)
 TopBar.BorderSizePixel = 0
 Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0, 12)
@@ -47,7 +61,7 @@ Title.Size = UDim2.new(0.6, 0, 1, 0)
 Title.BackgroundTransparency = 1
 Title.TextXAlignment = Enum.TextXAlignment.Left
 
--- Tombol Close
+-- Close Button
 local CloseButton = Instance.new("TextButton")
 CloseButton.Name = "CloseButton"
 CloseButton.Parent = TopBar
@@ -59,7 +73,7 @@ CloseButton.Size = UDim2.new(0, 40, 1, 0)
 CloseButton.Position = UDim2.new(1, -40, 0, 0)
 CloseButton.BackgroundTransparency = 1
 
--- Tombol Minimize
+-- Minimize Button
 local MinimizeButton = Instance.new("TextButton")
 MinimizeButton.Name = "MinimizeButton"
 MinimizeButton.Parent = TopBar
@@ -78,6 +92,7 @@ Tabs.Parent = MainFrame
 Tabs.Position = UDim2.new(0, 0, 0, 40)
 Tabs.Size = UDim2.new(1, 0, 0, 40)
 Tabs.BackgroundColor3 = Color3.fromRGB(45, 45, 65)
+Tabs.BackgroundTransparency = 0.1
 Tabs.BorderSizePixel = 0
 
 local TabsLayout = Instance.new("UIListLayout")
@@ -92,7 +107,7 @@ ContentFrame.Parent = MainFrame
 ContentFrame.Position = UDim2.new(0, 0, 0, 80)
 ContentFrame.Size = UDim2.new(1, 0, 1, -80)
 ContentFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
-ContentFrame.BackgroundTransparency = 0.05
+ContentFrame.BackgroundTransparency = 0.15
 ContentFrame.BorderSizePixel = 0
 
 -- Tabs Setup
@@ -126,11 +141,9 @@ for _, tab in ipairs(tabs) do
     TabButton.TextWrapped = true
     TabButton.TextYAlignment = Enum.TextYAlignment.Center
     TabButton.TextXAlignment = Enum.TextXAlignment.Center
+    TabButton.BackgroundTransparency = 0.15
     TabButton.AutoButtonColor = true
-    TabButton.BackgroundTransparency = 0.1
-
-    local Corner = Instance.new("UICorner", TabButton)
-    Corner.CornerRadius = UDim.new(0, 8)
+    Instance.new("UICorner", TabButton).CornerRadius = UDim.new(0, 8)
 
     local Content = Instance.new("Frame")
     Content.Name = tab.Name
@@ -144,29 +157,28 @@ for _, tab in ipairs(tabs) do
     end)
 end
 
--- Tampilkan default tab
+-- Default tab
 switchTab("AFK / Farm")
 
--- Minimize/Close logic
+-- Minimize / Restore Logic
 local isMinimized = false
+local originalSize = MainFrame.Size
 MinimizeButton.MouseButton1Click:Connect(function()
     isMinimized = not isMinimized
-    ContentFrame.Visible = not isMinimized
     Tabs.Visible = not isMinimized
-    if isMinimized then
-        MainFrame.Size = UDim2.new(0, 500, 0, 40)
-    else
-        MainFrame.Size = UDim2.new(0, 500, 0, 400)
-    end
+    ContentFrame.Visible = not isMinimized
+    MainFrame:TweenSize(
+        isMinimized and UDim2.new(0, 520, 0, 40) or originalSize,
+        Enum.EasingDirection.Out,
+        Enum.EasingStyle.Quad,
+        0.25,
+        true
+    )
 end)
 
+-- Close Logic
 CloseButton.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
-print("✅ Andromeda modern UI loaded. Ready to populate with features.")
-
-
-CloseButton.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
-end)
+print("✅ Andromeda modern UI loaded and styled.")
