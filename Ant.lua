@@ -1,6 +1,6 @@
 
 -- >>> 1. Load Fluent UI Library
-local Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/yourusername/obiiyeuem1.lua"))()
+local Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/obiiyeuem/vthangsitink/refs/heads/main/obiiyeuem1.lua"))()
 
 -- >>> 2. Data dan State Player
 local player = game.Players.LocalPlayer
