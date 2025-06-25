@@ -1,144 +1,96 @@
--- Atlas UI v1.1 - Fixed Close, Minimize, Opacity Improved
-local player = game.Players.LocalPlayer
-local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-gui.Name = "AtlasUI"
-gui.ResetOnSpawn = false
+-- Andromeda Bee Swarm Script - Modern UI Framework
+-- Inspired by AI MODZ layout (multi-tab, toggleable, mobile-friendly)
+
+-- Create UI Elements
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local TopBar = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local CloseButton = Instance.new("TextButton")
+local MinimizeButton = Instance.new("TextButton")
+local Tabs = Instance.new("Frame")
+local ContentFrame = Instance.new("Frame")
+
+-- Parent UI
+ScreenGui.Name = "AndromedaUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 -- Main Frame
-local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0, 750, 0, 500)
-main.Position = UDim2.new(0.5, -375, 0.5, -250)
-main.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
-main.BackgroundTransparency = 0.15 -- slightly transparent
-main.BorderSizePixel = 0
-main.Active = true
-main.Draggable = true
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+MainFrame.Position = UDim2.new(0.3, 0, 0.2, 0)
+MainFrame.Size = UDim2.new(0, 500, 0, 400)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
 
--- TopBar
-local topBar = Instance.new("Frame", main)
-topBar.Size = UDim2.new(1, 0, 0, 40)
-topBar.BackgroundColor3 = Color3.fromRGB(35, 60, 115)
-topBar.BackgroundTransparency = 0.1
+-- Top Bar
+TopBar.Name = "TopBar"
+TopBar.Parent = MainFrame
+TopBar.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
+TopBar.Size = UDim2.new(1, 0, 0, 40)
+TopBar.BorderSizePixel = 0
 
-local title = Instance.new("TextLabel", topBar)
-title.Size = UDim2.new(1, -80, 1, 0)
-title.Position = UDim2.new(0, 10, 0, 0)
-title.BackgroundTransparency = 1
-title.Text = "Atlas v1.1"
-title.TextColor3 = Color3.new(1, 1, 1)
-title.Font = Enum.Font.SourceSansBold
-title.TextSize = 22
-title.TextXAlignment = Enum.TextXAlignment.Left
-
-local close = Instance.new("TextButton", topBar)
-close.Size = UDim2.new(0, 40, 1, 0)
-close.Position = UDim2.new(1, -40, 0, 0)
-close.Text = "✕"
-close.BackgroundTransparency = 1
-close.TextColor3 = Color3.new(1, 1, 1)
-close.Font = Enum.Font.SourceSansBold
-close.TextSize = 20
-
-local minimize = Instance.new("TextButton", topBar)
-minimize.Size = UDim2.new(0, 40, 1, 0)
-minimize.Position = UDim2.new(1, -80, 0, 0)
-minimize.Text = "–"
-minimize.BackgroundTransparency = 1
-minimize.TextColor3 = Color3.new(1, 1, 1)
-minimize.Font = Enum.Font.SourceSansBold
-minimize.TextSize = 20
-
--- Left Tab Bar
-local sidebar = Instance.new("Frame", main)
-sidebar.Size = UDim2.new(0, 140, 1, -40)
-sidebar.Position = UDim2.new(0, 0, 0, 40)
-sidebar.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-sidebar.BackgroundTransparency = 0.2
-
--- Tabs list
-local tabNames = {
-    {"AFK / Farming", "🟢"},
-    {"Combat", "🔴"},
-    {"Teleport", "🧭"},
-    {"Settings", "⚙️"},
-    {"Misc", "💎"},
-    {"Token", "🔘"},
-    {"GUI", "🎨"},
-}
-
-local contentFrames = {}
-local tabButtons = {}
-local selectedTab
-local contentVisible = true
-
-local function createTab(index, name, icon)
-    local button = Instance.new("TextButton", sidebar)
-    button.Size = UDim2.new(1, 0, 0, 40)
-    button.Position = UDim2.new(0, 0, 0, (index - 1) * 40)
-    button.Text = icon .. "  " .. name
-    button.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
-    button.BackgroundTransparency = 0.2
-    button.TextColor3 = Color3.new(1, 1, 1)
-    button.Font = Enum.Font.SourceSansBold
-    button.TextSize = 18
-    button.BorderSizePixel = 0
-    button.AutoButtonColor = true
-    button.Name = name
-    tabButtons[name] = button
-
-    local content = Instance.new("Frame", main)
-    content.Position = UDim2.new(0, 140, 0, 40)
-    content.Size = UDim2.new(1, -140, 1, -40)
-    content.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
-    content.BackgroundTransparency = 0.2
-    content.Visible = false
-    content.Name = name .. "Content"
-
-    local label = Instance.new("TextLabel", content)
-    label.Size = UDim2.new(1, 0, 1, 0)
-    label.Text = "This is the [" .. name .. "] tab.\nInsert features here."
-    label.TextColor3 = Color3.new(1, 1, 1)
-    label.Font = Enum.Font.SourceSans
-    label.TextSize = 20
-    label.TextWrapped = true
-    label.TextYAlignment = Enum.TextYAlignment.Top
-    label.BackgroundTransparency = 1
-
-    contentFrames[name] = content
-
-    button.MouseButton1Click:Connect(function()
-        if selectedTab then
-            selectedTab.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
-            contentFrames[selectedTab.Name].Visible = false
-        end
-        button.BackgroundColor3 = Color3.fromRGB(45, 80, 150)
-        content.Visible = true
-        selectedTab = button
-    end)
-
-    if index == 1 then
-        button:MouseButton1Click()
-    end
-end
-
--- Create Tabs
-for i, tab in ipairs(tabNames) do
-    createTab(i, unpack(tab))
-end
+-- Title
+Title.Name = "Title"
+Title.Parent = TopBar
+Title.Text = "? ANDROMEDA MODZ"
+Title.Font = Enum.Font.SourceSansBold
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 20
+Title.Position = UDim2.new(0, 10, 0, 0)
+Title.Size = UDim2.new(0.6, 0, 1, 0)
+Title.BackgroundTransparency = 1
 
 -- Close Button
-close.MouseButton1Click:Connect(function()
-    gui:Destroy()
+CloseButton.Name = "CloseButton"
+CloseButton.Parent = TopBar
+CloseButton.Text = "✕"
+CloseButton.Font = Enum.Font.SourceSans
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 20
+CloseButton.Size = UDim2.new(0, 40, 1, 0)
+CloseButton.Position = UDim2.new(1, -40, 0, 0)
+CloseButton.BackgroundTransparency = 1
+
+-- Minimize Button
+MinimizeButton.Name = "MinimizeButton"
+MinimizeButton.Parent = TopBar
+MinimizeButton.Text = "–"
+MinimizeButton.Font = Enum.Font.SourceSans
+MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeButton.TextSize = 28
+MinimizeButton.Size = UDim2.new(0, 40, 1, 0)
+MinimizeButton.Position = UDim2.new(1, -80, 0, 0)
+MinimizeButton.BackgroundTransparency = 1
+
+-- Tabs Frame
+Tabs.Name = "Tabs"
+Tabs.Parent = MainFrame
+Tabs.Position = UDim2.new(0, 0, 0, 40)
+Tabs.Size = UDim2.new(1, 0, 0, 40)
+Tabs.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
+Tabs.BorderSizePixel = 0
+
+-- Content Area
+ContentFrame.Name = "ContentFrame"
+ContentFrame.Parent = MainFrame
+ContentFrame.Position = UDim2.new(0, 0, 0, 80)
+ContentFrame.Size = UDim2.new(1, 0, 1, -80)
+ContentFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+ContentFrame.BorderSizePixel = 0
+
+-- Logic for toggling visibility
+local isMinimized = false
+MinimizeButton.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    ContentFrame.Visible = not isMinimized
+    Tabs.Visible = not isMinimized
 end)
 
--- Minimize Toggle
-minimize.MouseButton1Click:Connect(function()
-    contentVisible = not contentVisible
-    sidebar.Visible = contentVisible
-    for _, frame in pairs(contentFrames) do
-        frame.Visible = false
-    end
-    if selectedTab and contentVisible then
-        contentFrames[selectedTab.Name].Visible = true
-    end
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
 end)
+ 
